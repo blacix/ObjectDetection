@@ -3,7 +3,7 @@ MODEL_NAME = "ssd_resnet50_v1_fpn_640x640_coco17_tpu-8"
 
 USE_GPU = True
 
-MODEL_GARDEN_DIR = "models/"
+TF_MODELS_REPOSITORY_DIR = "tf_models_repository/"
 TRAINING_DIR = "workspace/training_demo/"
 MODEL_DIR = TRAINING_DIR + "models/" + MODEL_NAME + "/"
 PRE_TRAINED_MODEL_DIR = TRAINING_DIR + "pre-trained-models/" + MODEL_NAME + "/"
@@ -22,7 +22,7 @@ PATH_TO_LABELS = LABEL_FILE
 PRE_TRAINED_CHECKPOINT = PRE_TRAINED_MODEL_DIR + "checkpoint/"
 PIPELINE_CONFIG = MODEL_DIR + "pipeline.config"
 
-OBJ_DETECTION_SCRIPTS_DIR = MODEL_GARDEN_DIR + "research/object_detection/"
+OBJ_DETECTION_SCRIPTS_DIR = TF_MODELS_REPOSITORY_DIR + "research/object_detection/"
 TRAIN_SCRIPT = OBJ_DETECTION_SCRIPTS_DIR + "model_main_tf2.py"
 EXPORT_SCRIPT = OBJ_DETECTION_SCRIPTS_DIR + "exporter_main_v2.py"
 
