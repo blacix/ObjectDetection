@@ -21,4 +21,4 @@ IMAGES_DIR = "workspace/training_demo/images/"
 TEST_IMAGES_DIR = IMAGES_DIR + "test/"
 TRAIN_IMAGES_DIR = IMAGES_DIR + "train/"
 
-EXPORT_DIR = TRAINING_DIR + "exported-models/" + MODEL_NAME
+EXPORT_DIR = TRAINING_DIR + "exported-models/" + MODEL_NAME + "/"

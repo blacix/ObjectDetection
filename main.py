@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 
 import os
 import pathlib
+import config
 
 category_index = ""
 IMAGE_PATHS = ""
@@ -45,17 +46,11 @@ def load_image_into_numpy_array(path):
 
 
 def load_model():
-    # %%
-    # Load the model
-    # ~~~~~~~~~~~~~~
-    # Next we load the downloaded model
-
-
     # PATH_TO_SAVED_MODEL = PATH_TO_MODEL_DIR + "/saved_model"
     # PATH_TO_SAVED_MODEL = "workspace/training_demo/pre-trained-models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model"
     # PATH_TO_SAVED_MODEL = "workspace/training_demo/pre-trained-models/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8/saved_model"
 
-    PATH_TO_SAVED_MODEL = "workspace/training_demo/exported-models/my_model/saved_model"
+    PATH_TO_SAVED_MODEL = config.EXPORT_DIR + "saved_model" # "workspace/training_demo/exported-models/my_model/saved_model"
 
     print('Loading model...', end='')
     start_time = time.time()
@@ -72,7 +67,7 @@ def load_model():
 
 def load_label_map():
     # PATH_TO_LABELS = "models/research/object_detection/data/mscoco_label_map.pbtxt"
-    PATH_TO_LABELS = "workspace/training_demo/annotations/label_map.pbtxt"
+    PATH_TO_LABELS = config.LABEL_FILE # "workspace/training_demo/annotations/label_map.pbtxt"
 
     # %%
     # Load label map data (for plotting)
@@ -82,8 +77,9 @@ def load_label_map():
     # functions, but anything that returns a dictionary mapping integers to appropriate string labels
     # would be fine.
 
-    return label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS,
-                                                                        use_display_name=True)
+    return label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
+
+
 def download_images():
     base_url = 'https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/test_images/'
     filenames = ['image1.jpg', 'image2.jpg']
@@ -103,13 +99,8 @@ def doit():
     cap = cv.VideoCapture(1)
     while(True):
 
-        ret, image_np = cap.read()
-
-    # for image_path in IMAGE_PATHS:
-    #     print('Running inference for {}... '.format(image_path), end='')
-
-        # image_np = load_image_into_numpy_array(image_path)
-
+        ret, image = cap.read()
+        image_np = np.array(image)
         # Things to try:
         # Flip horizontally
         # image_np = np.fliplr(image_np).copy()
@@ -134,8 +125,6 @@ def doit():
                       for key, value in detections.items()}
         detections['num_detections'] = num_detections
 
-        # print(detections)
-
         # detection_classes should be ints.
         detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
 
@@ -152,7 +141,7 @@ def doit():
             min_score_thresh=.50,
             agnostic_mode=False)
 
-        cv.imshow("yeee", image_np_with_detections)
+        cv.imshow("detections", image_np_with_detections)
         cv.waitKey(1)
 
 
