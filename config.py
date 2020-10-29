@@ -1,5 +1,5 @@
-# MODEL_NAME = "ssd_mobilenet_v2_320x320_coco17_tpu-8"
-MODEL_NAME = "ssd_resnet50_v1_fpn_640x640_coco17_tpu-8"
+MODEL_NAME = "ssd_mobilenet_v2_320x320_coco17_tpu-8"
+# MODEL_NAME = "ssd_resnet50_v1_fpn_640x640_coco17_tpu-8"
 
 USE_GPU = True
 
@@ -16,7 +16,7 @@ PATH_TO_SAVED_MODEL = EXPORT_DIR + "saved_model"
 # PATH_TO_SAVED_MODEL = PRE_TRAINED_MODEL_DIR + "saved_model"
 
 PATH_TO_LABELS = LABEL_FILE
-# PATH_TO_LABELS = MODEL_GARDEN_DIR + "/research/object_detection/data/mscoco_label_map.pbtxt"
+# PATH_TO_LABELS = TF_MODELS_REPOSITORY_DIR + "/research/object_detection/data/mscoco_label_map.pbtxt"
 
 
 PRE_TRAINED_CHECKPOINT = PRE_TRAINED_MODEL_DIR + "checkpoint/"

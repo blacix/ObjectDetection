@@ -24,7 +24,8 @@ def train_model():
 
 def export_model():
     print("exporting model {}".format(MODEL_NAME))
-    command = "python " + EXPORT_SCRIPT + " --input_type image_tensor --pipeline_config_path " + PIPELINE_CONFIG + " --trained_checkpoint_dir " + MODEL_DIR + " --output_directory " + EXPORT_DIR
+    command = "python " + EXPORT_SCRIPT + " --input_type image_tensor --pipeline_config_path "\
+              + PIPELINE_CONFIG + " --trained_checkpoint_dir " + MODEL_DIR + " --output_directory " + EXPORT_DIR
     print("command: {}".format(command))
     os.system(command)
 

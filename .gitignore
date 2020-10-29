@@ -1,6 +1,7 @@
 tf_models_repository/
 workspace/training_demo/models/*/c*
 workspace/training_demo/models/*/train
+workspace/training_demo/annotations/*xml*
 
 workspace/training_demo/images*
 workspace/training_demo/exported-models/
