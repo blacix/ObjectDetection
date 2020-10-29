@@ -148,6 +148,9 @@ def create_tf_example(group, path):
     }))
     return tf_example
 
+def stuff():
+    examples = pd.read_csv("FLAGS.csv_input")
+    grouped = split(examples, 'filename')
 
 def main(_):
 

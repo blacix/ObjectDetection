@@ -13,7 +13,6 @@ import config
 
 category_index = ""
 
-
 def load_image_into_numpy_array(path):
     """Load an image from file into a numpy array.
 
@@ -91,7 +90,7 @@ def doit():
             category_index,
             use_normalized_coordinates=True,
             max_boxes_to_draw=100,
-            min_score_thresh=.50,
+            min_score_thresh=.60,
             agnostic_mode=False)
 
         cv.imshow("detections", image_np_with_detections)

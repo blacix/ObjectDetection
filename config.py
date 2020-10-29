@@ -12,8 +12,8 @@ EXPORT_DIR = TRAINING_DIR + "exported-models/" + MODEL_NAME + "/"
 
 LABEL_FILE = ANNOTATIONS_DIR + "label_map.pbtxt"
 
-PATH_TO_SAVED_MODEL = EXPORT_DIR + "saved_model"
-# PATH_TO_SAVED_MODEL = PRE_TRAINED_MODEL_DIR + "saved_model"
+PATH_TO_SAVED_MODEL = EXPORT_DIR + "saved_model/"
+# PATH_TO_SAVED_MODEL = PRE_TRAINED_MODEL_DIR + "saved_model/"
 
 PATH_TO_LABELS = LABEL_FILE
 # PATH_TO_LABELS = TF_MODELS_REPOSITORY_DIR + "/research/object_detection/data/mscoco_label_map.pbtxt"
