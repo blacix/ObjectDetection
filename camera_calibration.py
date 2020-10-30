@@ -93,6 +93,8 @@ def save_calibration():
     global new_camera_matrix
     global dist_coeffs
 
+    print('Saving calibration...')
+
     # writes array to .yml file
     fs_write = cv.FileStorage('calibration.yml', cv.FILE_STORAGE_WRITE)
     arr = np.random.rand(5, 5)
@@ -107,6 +109,7 @@ def load_calibration():
     global new_camera_matrix
     global dist_coeffs
 
+    print('Loading calibration...')
     fs_read = cv.FileStorage('calibration.yml', cv.FILE_STORAGE_READ)
     camera_matrix = fs_read.getNode('camera_matrix').mat()
     new_camera_matrix = fs_read.getNode('new_camera_matrix').mat()
@@ -115,7 +118,7 @@ def load_calibration():
     fs_read.release()
 
 
-def show_camera():
+def show_camera_stream():
     cap = cv.VideoCapture(CAMERA_ID)
     while True:
         ret, img = cap.read()
@@ -129,7 +132,7 @@ def main():
     calibrate_camera()
     save_calibration()
     # load_calibration()
-    show_camera()
+    show_camera_stream()
     cv.destroyAllWindows()
 
 
