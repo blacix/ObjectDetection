@@ -12,7 +12,6 @@ import config
 
 import camera_calibration as calib
 
-category_index = ""
 
 def load_image_into_numpy_array(path):
     """Load an image from file into a numpy array.
@@ -49,12 +48,15 @@ def load_label_map():
 
 
 def doit():
-    cap = cv.VideoCapture(1)
-    camera_matrix, new_camera_matrix, dist_coeffs = calib.calibrate_camera()
+    cap = cv.VideoCapture(config.CAMERA_ID)
+    calib.calibrate_camera()
+
+    detect_fn = load_model()
+    category_index = load_label_map()
 
     while True:
         ret, image = cap.read()
-        undistorted_image = calib.undistort_image(image, camera_matrix, new_camera_matrix, dist_coeffs)
+        undistorted_image = calib.undistort_image(image)
         image_np = np.array(undistorted_image)
 
         # image_np = np.array(image)
@@ -99,10 +101,11 @@ def doit():
             agnostic_mode=False)
 
         cv.imshow("detections", image_np_with_detections)
-        cv.waitKey(1)
+        if cv.waitKey(1) == ord('q'):
+            break
+
+    cv.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    detect_fn = load_model()
-    category_index = load_label_map()
     doit()

@@ -6,8 +6,18 @@ from __future__ import print_function
 import numpy as np
 import cv2 as cv
 
+from config import CAMERA_ID
+
+camera_matrix = None
+new_camera_matrix = None
+dist_coeffs = None
+
 
 def calibrate_camera():
+    global camera_matrix
+    global new_camera_matrix
+    global dist_coeffs
+
     square_size = 5.0
     pattern_size = (9, 6)
     # prepare pattern_points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
@@ -21,7 +31,7 @@ def calibrate_camera():
     term_criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     # term_criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_COUNT, 30, 0.1)
 
-    cap = cv.VideoCapture(1)
+    cap = cv.VideoCapture(CAMERA_ID)
     while True:
         ret, img = cap.read()
         gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -44,19 +54,25 @@ def calibrate_camera():
     h, w, = gray.shape
 
     print("calibrating camera...");
-    ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, (w, h), None, None)
-    # ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, gray.shape[::-1], None, None)
+    if len(obj_points) > 0:
+        ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, (w, h), None, None)
+        # ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, gray.shape[::-1], None, None)
 
-    print("calculating optimal camera matrix...");
-    new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
+        print("calculating optimal camera matrix...");
+        new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
 
     print("camera  calibrated")
     cv.destroyWindow('calibration')
 
-    return camera_matrix, new_camera_matrix, dist_coeffs
 
+def undistort_image(img):
+    global camera_matrix
+    global new_camera_matrix
+    global dist_coeffs
 
-def undistort_image(img, camera_matrix, new_camera_matrix, dist_coeffs):
+    if camera_matrix is None or new_camera_matrix is None or dist_coeffs is None:
+        return img
+
     # with undistort
     dst = cv.undistort(img, camera_matrix, dist_coeffs, None, new_camera_matrix)
 
@@ -71,17 +87,19 @@ def undistort_image(img, camera_matrix, new_camera_matrix, dist_coeffs):
     return dst
 
 
-def main():
-    camera_matrix, new_camera_matrix, dist_coeffs = calibrate_camera()
-
-    cap = cv.VideoCapture(1)
+def show_camera():
+    cap = cv.VideoCapture(CAMERA_ID)
     while True:
         ret, img = cap.read()
-        undistorted_image = undistort_image(img, camera_matrix, new_camera_matrix, dist_coeffs)
+        undistorted_image = undistort_image(img)
         cv.imshow('undistorted', undistorted_image)
         if cv.waitKey(500) == ord('q'):
             break;
 
+
+def main():
+    calibrate_camera()
+    show_camera()
     cv.destroyAllWindows()
 
 
