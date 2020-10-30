@@ -27,8 +27,8 @@ if __name__ == '__main__':
 
     while True:
         ret, image = cap.read()
-        image_markers, _, _ = marker_detector.detect_markers(image)
-        cv.imshow("markers", image_markers)
+        image, _, _ = marker_detector.detect_markers(image)
+        cv.imshow("markers", image)
         if cv.waitKey(100) == ord('q'):
             break
 
