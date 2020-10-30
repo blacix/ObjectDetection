@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image
 import config
 
+import camera_calibration as calib
 
 category_index = ""
 
@@ -49,10 +50,14 @@ def load_label_map():
 
 def doit():
     cap = cv.VideoCapture(1)
-    while(True):
+    camera_matrix, new_camera_matrix, dist_coeffs = calib.calibrate_camera()
 
+    while True:
         ret, image = cap.read()
-        image_np = np.array(image)
+        undistorted_image = calib.undistort_image(image, camera_matrix, new_camera_matrix, dist_coeffs)
+        image_np = np.array(undistorted_image)
+
+        # image_np = np.array(image)
         # Things to try:
         # Flip horizontally
         # image_np = np.fliplr(image_np).copy()
