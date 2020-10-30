@@ -1,6 +1,7 @@
 import cv2 as cv
 import cv2.aruco as aruco
 from config import CAMERA_ID
+import camera_calibration as calib
 
 
 class MarkerDetector:
@@ -9,7 +10,7 @@ class MarkerDetector:
         # print(aruco_dict)
         self.arucoParameters = aruco.DetectorParameters_create()
         self.arucoParameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
-        self.arucoParameters.minDistanceToBorder = 5
+        # self.arucoParameters.minDistanceToBorder = 5
 
     def detect_markers(self, image):
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -21,11 +22,13 @@ class MarkerDetector:
 
 if __name__ == '__main__':
     cap = cv.VideoCapture(CAMERA_ID)
-
+    calib.load_calibration()
     marker_detector = MarkerDetector()
 
     while True:
         ret, image = cap.read()
+        image = calib.undistort_image(image)
+
         image, _, _ = marker_detector.detect_markers(image)
         cv.imshow("markers", image)
         if cv.waitKey(100) == ord('q'):

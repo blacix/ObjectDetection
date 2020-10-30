@@ -10,6 +10,7 @@ from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
 
 import config
+import camera_calibration as calib
 
 
 class ObjectDetector:
@@ -99,11 +100,13 @@ class ObjectDetector:
 
 if __name__ == '__main__':
     cap = cv.VideoCapture(config.CAMERA_ID)
-
+    calib.load_calibration()
     object_detector = ObjectDetector()
 
     while True:
         ret, image = cap.read()
+        image = calib.undistort_image(image)
+
         image = object_detector.detect_objects(image)
         cv.imshow('object detection', image)
         if cv.waitKey(100) == ord('q'):

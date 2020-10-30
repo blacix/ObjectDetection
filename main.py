@@ -16,9 +16,7 @@ def main():
 
     while True:
         ret, image = cap.read()
-
-        if config.USE_CALIBRATION:
-            image = calib.undistort_image(image)
+        image = calib.undistort_image(image)
 
         image = object_detector.detect_objects(image)
         image, _, _ = marker_detector.detect_markers(image)

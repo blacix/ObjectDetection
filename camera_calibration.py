@@ -6,7 +6,7 @@ from __future__ import print_function
 import numpy as np
 import cv2 as cv
 
-from config import CAMERA_ID
+from config import CAMERA_ID, USE_CALIBRATION
 
 # TODO make a class
 
@@ -68,28 +68,6 @@ def calibrate_camera():
     cv.destroyWindow('calibration')
 
 
-def undistort_image(img):
-    global camera_matrix
-    global new_camera_matrix
-    global dist_coeffs
-
-    if not is_camera_calibrated():
-        return img
-
-    # with undistort
-    dst = cv.undistort(img, camera_matrix, dist_coeffs, None, new_camera_matrix)
-
-    # with remap
-    # mapx, mapy = cv.initUndistortRectifyMap(camera_matrix, dist_coeffs, None, new_camera_matrix, (w, h), cv.CV_32FC1)
-    # dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
-
-    # crop the image
-    # x, y, w, h = roi
-    # dst = dst[y:y + h, x:x + w]
-
-    return dst
-
-
 def save_calibration():
     global camera_matrix
     global new_camera_matrix
@@ -120,6 +98,28 @@ def load_calibration():
     fs_read.release()
 
 
+def undistort_image(img):
+    global camera_matrix
+    global new_camera_matrix
+    global dist_coeffs
+
+    if not is_camera_calibrated() or not USE_CALIBRATION:
+        return img
+
+    # with undistort
+    dst = cv.undistort(img, camera_matrix, dist_coeffs, None, new_camera_matrix)
+
+    # with remap
+    # mapx, mapy = cv.initUndistortRectifyMap(camera_matrix, dist_coeffs, None, new_camera_matrix, (w, h), cv.CV_32FC1)
+    # dst = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+
+    # crop the image
+    # x, y, w, h = roi
+    # dst = dst[y:y + h, x:x + w]
+
+    return dst
+
+
 def is_camera_calibrated():
     global camera_matrix
     global new_camera_matrix
@@ -132,9 +132,9 @@ def show_camera_stream():
     cap = cv.VideoCapture(CAMERA_ID)
     while True:
         ret, img = cap.read()
-        undistorted_image = undistort_image(img)
-        cv.imshow('undistorted', undistorted_image)
-        if cv.waitKey(500) == ord('q'):
+        img = undistort_image(img)
+        cv.imshow("calibration", img)
+        if cv.waitKey(100) == ord('q'):
             break
 
 
