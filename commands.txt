@@ -10,3 +10,10 @@ tensorboard --logdir=models/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8
 
 python .\exporter_main_v2.py --input_type image_tensor --pipeline_config_path .\models\ssd_mobilenet_v2_320x320_coco17_tpu-8\pipeline.config --trained_checkpoint_dir .\models\ssd_mobilenet_v2_320x320_coco17_tpu-8\ --output_directory .\exported-models\my_model
 
+pip install --force-reinstall avro-python3==1.9.2
+
+pip install 'stevedore>=1.3.0,<1.4.0' --force-reinstall
+
+pip install opencv-contrib-python --force-reinstall
+
+1.9.2,<1.10.0,>=1.8.1;

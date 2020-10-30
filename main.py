@@ -1,7 +1,10 @@
 # https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest/install.html#install-the-tensorflow-pip-package
 
 import tensorflow as tf
+import numpy as np
 import cv2 as cv
+import cv2.aruco as aruco
+
 import time
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
@@ -51,56 +54,68 @@ def doit():
     cap = cv.VideoCapture(config.CAMERA_ID)
     calib.load_calibration()
 
-    detect_fn = load_model()
-    category_index = load_label_map()
+    # detect_fn = load_model()
+    # category_index = load_label_map()
 
     while True:
         ret, image = cap.read()
         undistorted_image = calib.undistort_image(image)
         image_np = np.array(undistorted_image)
 
-        # image_np = np.array(image)
-        # Things to try:
-        # Flip horizontally
-        # image_np = np.fliplr(image_np).copy()
+        aruco_dict = aruco.Dictionary_get(aruco.DICT_ARUCO_ORIGINAL)
+        # print(aruco_dict)
+        arucoParameters = aruco.DetectorParameters_create()
+        arucoParameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
+        arucoParameters.minDistanceToBorder = 5
 
-        # Convert image to grayscale
-        # image_np = np.tile(
-        #     np.mean(image_np, 2, keepdims=True), (1, 1, 3)).astype(np.uint8)
+        gray = cv.cvtColor(image_np, cv.COLOR_BGR2GRAY)
+        corners, ids, rejectedImgPoints = aruco.detectMarkers(
+            gray, aruco_dict, parameters=arucoParameters)
+        image_markers = aruco.drawDetectedMarkers(image_np, corners, ids)
+        cv.imshow("markers", image_markers)
 
-        # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
-        input_tensor = tf.convert_to_tensor(image_np)
-        # The model expects a batch of images, so add an axis with `tf.newaxis`.
-        input_tensor = input_tensor[tf.newaxis, ...]
-
-        # input_tensor = np.expand_dims(image_np, 0)
-        detections = detect_fn(input_tensor)
-
-        # All outputs are batches tensors.
-        # Convert to numpy arrays, and take index [0] to remove the batch dimension.
-        # We're only interested in the first num_detections.
-        num_detections = int(detections.pop('num_detections'))
-        detections = {key: value[0, :num_detections].numpy()
-                      for key, value in detections.items()}
-        detections['num_detections'] = num_detections
-
-        # detection_classes should be ints.
-        detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
-
-        image_np_with_detections = image_np.copy()
-
-        viz_utils.visualize_boxes_and_labels_on_image_array(
-            image_np_with_detections,
-            detections['detection_boxes'],
-            detections['detection_classes'],
-            detections['detection_scores'],
-            category_index,
-            use_normalized_coordinates=True,
-            max_boxes_to_draw=100,
-            min_score_thresh=.60,
-            agnostic_mode=False)
-
-        cv.imshow("detections", image_np_with_detections)
+        # # image_np = np.array(image)
+        # # Things to try:
+        # # Flip horizontally
+        # # image_np = np.fliplr(image_np).copy()
+        #
+        # # Convert image to grayscale
+        # # image_np = np.tile(
+        # #     np.mean(image_np, 2, keepdims=True), (1, 1, 3)).astype(np.uint8)
+        #
+        # # The input needs to be a tensor, convert it using `tf.convert_to_tensor`.
+        # input_tensor = tf.convert_to_tensor(image_np)
+        # # The model expects a batch of images, so add an axis with `tf.newaxis`.
+        # input_tensor = input_tensor[tf.newaxis, ...]
+        #
+        # # input_tensor = np.expand_dims(image_np, 0)
+        # detections = detect_fn(input_tensor)
+        #
+        # # All outputs are batches tensors.
+        # # Convert to numpy arrays, and take index [0] to remove the batch dimension.
+        # # We're only interested in the first num_detections.
+        # num_detections = int(detections.pop('num_detections'))
+        # detections = {key: value[0, :num_detections].numpy()
+        #               for key, value in detections.items()}
+        # detections['num_detections'] = num_detections
+        #
+        # # detection_classes should be ints.
+        # detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
+        #
+        # image_np_with_detections = image_np.copy()
+        #
+        # viz_utils.visualize_boxes_and_labels_on_image_array(
+        #     image_np_with_detections,
+        #     detections['detection_boxes'],
+        #     detections['detection_classes'],
+        #     detections['detection_scores'],
+        #     category_index,
+        #     use_normalized_coordinates=True,
+        #     max_boxes_to_draw=100,
+        #     min_score_thresh=.60,
+        #     agnostic_mode=False)
+        #
+        # cv.imshow("detections", image_np_with_detections)
         if cv.waitKey(1) == ord('q'):
             break
 
