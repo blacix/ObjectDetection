@@ -49,7 +49,7 @@ def load_label_map():
 
 def doit():
     cap = cv.VideoCapture(config.CAMERA_ID)
-    calib.calibrate_camera()
+    calib.load_calibration()
 
     detect_fn = load_model()
     category_index = load_label_map()

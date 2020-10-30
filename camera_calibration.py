@@ -50,6 +50,7 @@ def calibrate_camera():
         if cv.waitKey(500) == ord('q'):
             break;
 
+    cv.destroyWindow('calibration')
     h, w, _ = img.shape
     h, w, = gray.shape
 
@@ -87,6 +88,33 @@ def undistort_image(img):
     return dst
 
 
+def save_calibration():
+    global camera_matrix
+    global new_camera_matrix
+    global dist_coeffs
+
+    # writes array to .yml file
+    fs_write = cv.FileStorage('calibration.yml', cv.FILE_STORAGE_WRITE)
+    arr = np.random.rand(5, 5)
+    fs_write.write("camera_matrix", camera_matrix)
+    fs_write.write("new_camera_matrix", new_camera_matrix)
+    fs_write.write("dist_coeffs", dist_coeffs)
+    fs_write.release()
+
+
+def load_calibration():
+    global camera_matrix
+    global new_camera_matrix
+    global dist_coeffs
+
+    fs_read = cv.FileStorage('calibration.yml', cv.FILE_STORAGE_READ)
+    camera_matrix = fs_read.getNode('camera_matrix').mat()
+    new_camera_matrix = fs_read.getNode('new_camera_matrix').mat()
+    dist_coeffs = fs_read.getNode('dist_coeffs').mat()
+
+    fs_read.release()
+
+
 def show_camera():
     cap = cv.VideoCapture(CAMERA_ID)
     while True:
@@ -99,6 +127,8 @@ def show_camera():
 
 def main():
     calibrate_camera()
+    save_calibration()
+    # load_calibration()
     show_camera()
     cv.destroyAllWindows()
 
