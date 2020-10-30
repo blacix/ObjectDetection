@@ -8,6 +8,8 @@ import cv2 as cv
 
 from config import CAMERA_ID
 
+# TODO make a class
+
 camera_matrix = None
 new_camera_matrix = None
 dist_coeffs = None
@@ -71,7 +73,7 @@ def undistort_image(img):
     global new_camera_matrix
     global dist_coeffs
 
-    if camera_matrix is None or new_camera_matrix is None or dist_coeffs is None:
+    if not is_camera_calibrated():
         return img
 
     # with undistort
@@ -118,6 +120,14 @@ def load_calibration():
     fs_read.release()
 
 
+def is_camera_calibrated():
+    global camera_matrix
+    global new_camera_matrix
+    global dist_coeffs
+
+    return camera_matrix is not None and new_camera_matrix is not None and dist_coeffs is not None
+
+
 def show_camera_stream():
     cap = cv.VideoCapture(CAMERA_ID)
     while True:
@@ -125,7 +135,7 @@ def show_camera_stream():
         undistorted_image = undistort_image(img)
         cv.imshow('undistorted', undistorted_image)
         if cv.waitKey(500) == ord('q'):
-            break;
+            break
 
 
 def main():
