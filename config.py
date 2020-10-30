@@ -1,3 +1,6 @@
+CAMERA_ID = 1
+USE_CALIBRATION = False
+
 MODEL_NAME = "ssd_mobilenet_v2_320x320_coco17_tpu-8"
 # MODEL_NAME = "ssd_resnet50_v1_fpn_640x640_coco17_tpu-8"
 
@@ -13,10 +16,10 @@ EXPORT_DIR = TRAINING_DIR + "exported-models/" + MODEL_NAME + "/"
 LABEL_FILE = ANNOTATIONS_DIR + "label_map.pbtxt"
 
 PATH_TO_SAVED_MODEL = EXPORT_DIR + "saved_model/"
-# PATH_TO_SAVED_MODEL = PRE_TRAINED_MODEL_DIR + "saved_model/"
+PATH_TO_SAVED_MODEL = PRE_TRAINED_MODEL_DIR + "saved_model/"
 
 PATH_TO_LABELS = LABEL_FILE
-# PATH_TO_LABELS = TF_MODELS_REPOSITORY_DIR + "/research/object_detection/data/mscoco_label_map.pbtxt"
+PATH_TO_LABELS = TF_MODELS_REPOSITORY_DIR + "/research/object_detection/data/mscoco_label_map.pbtxt"
 
 
 PRE_TRAINED_CHECKPOINT = PRE_TRAINED_MODEL_DIR + "checkpoint/"
@@ -33,6 +36,3 @@ IMAGES_DIR = "workspace/training_demo/images/"
 TEST_IMAGES_DIR = IMAGES_DIR + "test/"
 TRAIN_IMAGES_DIR = IMAGES_DIR + "train/"
 
-
-CAMERA_ID = 1
-USE_CALIBRATION = False

@@ -1,6 +1,5 @@
-import cv2.aruco as aruco
-
 import cv2 as cv
+import cv2.aruco as aruco
 from config import CAMERA_ID
 
 
@@ -14,7 +13,7 @@ class MarkerDetector:
 
     def detect_markers(self, image):
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        corners, ids, rejectedImgPoints = aruco.detectMarkers(
+        corners, ids, rejected_img_points = aruco.detectMarkers(
             gray, self.aruco_dict, parameters=self.arucoParameters)
         image_markers = aruco.drawDetectedMarkers(image, corners, ids)
         return image_markers, corners, ids

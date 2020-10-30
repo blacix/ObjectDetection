@@ -1,17 +1,14 @@
 # https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest/install.html#install-the-tensorflow-pip-package
 
-import tensorflow as tf
-import numpy as np
-import cv2 as cv
-
-
 import time
+import tensorflow as tf
+import cv2 as cv
+import numpy as np
+from PIL import Image
 
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
 
-import numpy as np
-from PIL import Image
 import config
 
 
