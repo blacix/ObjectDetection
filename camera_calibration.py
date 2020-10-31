@@ -8,7 +8,18 @@ import cv2 as cv
 
 from config import CAMERA_ID, USE_CALIBRATION
 
-# TODO make a class
+
+class UndistortedVideoCapture:
+    def __init__(self, camera_id):
+        self.video_capture = cv.VideoCapture(camera_id)
+        load_calibration()
+
+    def read(self):
+        ret, image = self.video_capture.read()
+        if ret:
+            image = undistort_image(image)
+        return ret, image
+
 
 camera_matrix = None
 new_camera_matrix = None
@@ -129,10 +140,9 @@ def is_camera_calibrated():
 
 
 def show_camera_stream():
-    cap = cv.VideoCapture(CAMERA_ID)
+    cap = UndistortedVideoCapture(CAMERA_ID)
     while True:
         ret, img = cap.read()
-        img = undistort_image(img)
         cv.imshow("calibration", img)
         if cv.waitKey(100) == ord('q'):
             break

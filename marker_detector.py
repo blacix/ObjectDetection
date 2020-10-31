@@ -21,13 +21,11 @@ class MarkerDetector:
 
 
 if __name__ == '__main__':
-    cap = cv.VideoCapture(CAMERA_ID)
-    calib.load_calibration()
+    cap = calib.UndistortedVideoCapture(CAMERA_ID)
     marker_detector = MarkerDetector()
 
     while True:
         ret, image = cap.read()
-        image = calib.undistort_image(image)
 
         image, _, _ = marker_detector.detect_markers(image)
         cv.imshow("markers", image)

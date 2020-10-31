@@ -7,16 +7,13 @@ from marker_detector import MarkerDetector
 
 
 def main():
-    cap = cv.VideoCapture(config.CAMERA_ID)
-
-    calib.load_calibration()
+    cap = calib.UndistortedVideoCapture(config.CAMERA_ID)
 
     object_detector = ObjectDetector()
     marker_detector = MarkerDetector()
 
     while True:
         ret, image = cap.read()
-        image = calib.undistort_image(image)
 
         image = object_detector.detect_objects(image)
         image, _, _ = marker_detector.detect_markers(image)

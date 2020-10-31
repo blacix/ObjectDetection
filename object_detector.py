@@ -99,13 +99,11 @@ class ObjectDetector:
 
 
 if __name__ == '__main__':
-    cap = cv.VideoCapture(config.CAMERA_ID)
-    calib.load_calibration()
+    cap = calib.UndistortedVideoCapture(config.CAMERA_ID)
     object_detector = ObjectDetector()
 
     while True:
         ret, image = cap.read()
-        image = calib.undistort_image(image)
 
         image = object_detector.detect_objects(image)
         cv.imshow('object detection', image)
