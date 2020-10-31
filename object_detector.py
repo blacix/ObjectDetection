@@ -104,6 +104,8 @@ if __name__ == '__main__':
 
     while True:
         ret, image = cap.read()
+        if not ret:
+            continue
 
         image = object_detector.detect_objects(image)
         cv.imshow('object detection', image)

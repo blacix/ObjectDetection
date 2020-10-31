@@ -26,6 +26,8 @@ if __name__ == '__main__':
 
     while True:
         ret, image = cap.read()
+        if not ret:
+            continue
 
         image, _, _ = marker_detector.detect_markers(image)
         cv.imshow("markers", image)

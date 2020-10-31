@@ -14,6 +14,8 @@ def main():
 
     while True:
         ret, image = cap.read()
+        if not ret:
+            continue
 
         image = object_detector.detect_objects(image)
         image, _, _ = marker_detector.detect_markers(image)
