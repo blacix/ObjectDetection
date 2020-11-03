@@ -4,8 +4,9 @@ CAMERA_ID = 1
 USE_CALIBRATION = False
 USE_GPU = True
 
-MODEL_NAME = "ssd_mobilenet_v2_320x320_coco17_tpu-8"
+# MODEL_NAME = "ssd_mobilenet_v2_320x320_coco17_tpu-8"
 # MODEL_NAME = "ssd_resnet50_v1_fpn_640x640_coco17_tpu-8"
+MODEL_NAME = "ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8"
 
 TF_MODELS_REPOSITORY_DIR = "tf_models_repository"
 TRAINING_DIR = os.path.join("workspace", "training_demo")
