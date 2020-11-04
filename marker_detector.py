@@ -38,16 +38,15 @@ if __name__ == '__main__':
     marker_detector = MarkerDetector()
     # marker_detector.generate_marker_images()
 
+    marker_count = 0
     while True:
         ret, image = cap.read()
         if not ret:
             continue
-
-        marker_cont = 0
         image, _, ids = marker_detector.detect_markers(image)
         if ids is not None:
-            marker_cont = len(ids)
-        text = "markers: {}".format(marker_cont)
+            marker_count = len(ids)
+        text = "markers: {}".format(marker_count)
         image = cv.putText(image, text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv.LINE_AA)
         cv.imshow("markers", image)
         if cv.waitKey(100) == ord('q'):
