@@ -9,7 +9,7 @@ USE_GPU = True
 MODEL_NAME = "ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8"
 
 TF_MODELS_REPOSITORY_DIR = "tf_models_repository"
-TRAINING_DIR = os.path.join("workspace", "training_demo")
+TRAINING_DIR = "model_training"
 MODEL_DIR = os.path.join(TRAINING_DIR, "models", MODEL_NAME)
 PRE_TRAINED_MODEL_DIR = os.path.join(TRAINING_DIR, "pre-trained-models", MODEL_NAME)
 EXPORT_DIR = os.path.join(TRAINING_DIR, "exported-models", MODEL_NAME)
@@ -25,15 +25,12 @@ PATH_TO_SAVED_MODEL = os.path.join(EXPORT_DIR, "saved_model")
 PATH_TO_LABELS = LABEL_FILE
 # PATH_TO_LABELS = os.path.join(TF_MODELS_REPOSITORY_DIR, "research", "object_detection", "data", "mscoco_label_map.pbtxt")
 
-
-# PRE_TRAINED_CHECKPOINT = os.path.join(PRE_TRAINED_MODEL_DIR, "checkpoint")
 PIPELINE_CONFIG = os.path.join(MODEL_DIR, "pipeline.config")
-
 
 OBJ_DETECTION_SCRIPTS_DIR = os.path.join(TF_MODELS_REPOSITORY_DIR, "research", "object_detection")
 TRAIN_SCRIPT = os.path.join(OBJ_DETECTION_SCRIPTS_DIR, "model_main_tf2.py")
 EXPORT_SCRIPT = os.path.join(OBJ_DETECTION_SCRIPTS_DIR, "exporter_main_v2.py")
 
-IMAGES_DIR = os.path.join("workspace", "training_demo", "images")
+IMAGES_DIR = os.path.join(TRAINING_DIR, "images")
 TEST_IMAGES_DIR = os.path.join(IMAGES_DIR, "test")
 TRAIN_IMAGES_DIR = os.path.join(IMAGES_DIR, "train")
