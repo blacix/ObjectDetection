@@ -92,7 +92,7 @@ class ObjectDetector:
             self.category_index,
             use_normalized_coordinates=True,
             max_boxes_to_draw=100,
-            min_score_thresh=.60,
+            min_score_thresh=config.MIN_SCORE_THRESHOLD,
             agnostic_mode=False)
 
         return image_np_with_detections
