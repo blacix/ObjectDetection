@@ -1,12 +1,13 @@
-tf_models_repository/
-model_training/models/*/c*
-model_training/models/*/train
-model_training/annotations/*xml*
+models-master/
+model-training/models/*/c*
+model-training/models/*/train
+model-training/annotations/*xml*
 
-model_training/images*
-model_training/exported-models/
-model_training/pre-trained-models/
-model_training/annotations/*.record
+model-training/images*
+model-training/exported-models/
+model-training/pre-trained-models/
+model-training/annotations/*.record
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

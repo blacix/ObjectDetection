@@ -1,4 +1,7 @@
 
+# this is not supported in TF2.
+# saved model can be used
+
 def convert_saved_model_to_pb(output_node_names, input_saved_model_dir, output_graph_dir):
     from tensorflow.python.tools import freeze_graph
 

@@ -8,8 +8,8 @@ USE_GPU = True
 # MODEL_NAME = "ssd_resnet50_v1_fpn_640x640_coco17_tpu-8"
 MODEL_NAME = "ssd_mobilenet_v2_fpnlite_640x640_coco17_tpu-8"
 
-TF_MODELS_REPOSITORY_DIR = "tf_models_repository"
-TRAINING_DIR = "model_training"
+TF_MODELS_REPOSITORY_DIR = "models-master"
+TRAINING_DIR = "model-training"
 MODEL_DIR = os.path.join(TRAINING_DIR, "models", MODEL_NAME)
 PRE_TRAINED_MODEL_DIR = os.path.join(TRAINING_DIR, "pre-trained-models", MODEL_NAME)
 EXPORT_DIR = os.path.join(TRAINING_DIR, "exported-models", MODEL_NAME)
