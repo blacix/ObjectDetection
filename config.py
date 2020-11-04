@@ -21,9 +21,9 @@ TRAIN_RECORD_FILE = os.path.join(ANNOTATIONS_DIR, "train.record")
 
 # for running
 PATH_TO_SAVED_MODEL = os.path.join(EXPORT_DIR, "saved_model")
-PATH_TO_SAVED_MODEL = os.path.join(PRE_TRAINED_MODEL_DIR, "saved_model")
+# PATH_TO_SAVED_MODEL = os.path.join(PRE_TRAINED_MODEL_DIR, "saved_model")
 PATH_TO_LABELS = LABEL_FILE
-PATH_TO_LABELS = os.path.join(TF_MODELS_REPOSITORY_DIR, "research", "object_detection", "data", "mscoco_label_map.pbtxt")
+# PATH_TO_LABELS = os.path.join(TF_MODELS_REPOSITORY_DIR, "research", "object_detection", "data", "mscoco_label_map.pbtxt")
 
 
 # PRE_TRAINED_CHECKPOINT = os.path.join(PRE_TRAINED_MODEL_DIR, "checkpoint")
