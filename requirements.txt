@@ -15,7 +15,7 @@ dataclasses==0.6
 dill==0.3.1.1
 dm-tree==0.1.5
 docopt==0.6.2
-fastavro==1.0.0.post1
+fastavro==1.1.0
 future==0.18.2
 gast==0.3.3
 gin-config==0.3.0
@@ -39,7 +39,7 @@ importlib-metadata==2.0.0
 importlib-resources==3.3.0
 kaggle==1.5.9
 Keras-Preprocessing==1.1.2
-kiwisolver==1.3.0
+kiwisolver==1.3.1
 lvis==0.5.3
 lxml==4.6.1
 Markdown==3.3.3
@@ -48,12 +48,12 @@ mock==2.0.0
 numpy==1.18.5
 oauth2client==4.1.3
 oauthlib==3.1.0
-object-detection @ file:///D:/Projects/py/ObjectDetection/tf_models_repository/research
-opencv-contrib-python==4.4.0.44
-opencv-python==4.4.0.44
-opencv-python-headless==4.4.0.44
+object-detection @ file:///D:/Projects/py/ObjectDetection/models-master/research
+opencv-contrib-python==4.4.0.46
+opencv-python==4.4.0.46
+opencv-python-headless==4.4.0.46
 opt-einsum==3.3.0
-pandas==1.1.3
+pandas==1.1.4
 pbr==5.5.1
 Pillow==8.0.1
 promise==2.3
@@ -71,7 +71,7 @@ pymongo==3.11.0
 pyparsing==2.4.7
 python-dateutil==2.8.1
 python-slugify==4.0.1
-pytz==2020.1
+pytz==2020.4
 PyYAML==5.3.1
 requests==2.24.0
 requests-oauthlib==1.3.0
@@ -87,7 +87,7 @@ tensorflow-addons==0.11.2
 tensorflow-datasets==4.0.1
 tensorflow-estimator==2.3.0
 tensorflow-hub==0.10.0
-tensorflow-metadata==0.24.0
+tensorflow-metadata==0.25.0
 tensorflow-model-optimization==0.5.0
 termcolor==1.1.0
 text-unidecode==1.3
