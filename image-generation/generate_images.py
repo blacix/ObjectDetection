@@ -8,7 +8,7 @@ from PIL import Image, ImageEnhance
 from pathlib import Path
 
 import xml.etree.cElementTree as ET
-
+import cv2 as cv
 
 # Entrypoint Args
 parser = argparse.ArgumentParser(description='Create synthetic training data for object detection algorithms.')
@@ -85,6 +85,38 @@ def mutate_image(img):
     return img, mask
 
 
+def scale_rotate_translate(image, angle, center=None, new_center=None, scale=None, expand=False):
+    if center is None:
+        return image.rotate(angle, expand=expand)
+
+    angle = 30
+    angle = -angle/180.0*math.pi
+
+    nx, ny = x, y = center
+    sx=sy=1.0
+    if new_center:
+        (nx, ny) = new_center
+    if scale:
+        (sx, sy) = scale
+    cosine = math.cos(angle)
+    sine = math.sin(angle)
+
+    a = cosine/sx
+    b = sine/sx + math.tan(angle)
+    c = x-nx*a-ny*b
+    d = -sine/sy
+    e = cosine/sy
+    f = y-nx*d-ny*e
+
+    # a = cosine/sx
+    # b = sine/sx
+    # c = x-nx*a-ny*b
+    # d = -sine/sy
+    # e = cosine/sy
+    # f = y-nx*d-ny*e
+    return image.transform(image.size, Image.AFFINE, (a, b, c, d, e, f), resample=Image.BICUBIC)
+
+
 def create_xml(object_label, out_filename, xmin, ymin, xmax, ymax, img_width, img_height, truncated):
     tag_annotation = ET.Element("annotation")
     tag_folder = ET.SubElement(tag_annotation, "folder").text = "./"
@@ -151,7 +183,9 @@ if __name__ == "__main__":
     print("Making synthetic images.", flush=True)
     # resize_images(bkg_images)
     # exit()
-    for bkg in bkg_images:
+    # for bkg in bkg_images:
+    bkg = bkg_images[0]
+    if True:
         # Load the background image
         bkg_path = base_bkgs_path + bkg
         bkg_img = Image.open(bkg_path)
@@ -169,6 +203,8 @@ if __name__ == "__main__":
             for h, w, x, y in zip(obj_h, obj_w, x_pos, y_pos):
                 # Copy background
                 bkg_w_obj = bkg_img.copy()
+
+                # new_obj = scale_rotate_translate(obj_img, 90, center=(w//2, h//2), new_center=None, scale=(1.0, 1.0), expand=True)
 
                 new_obj, mask = mutate_image(obj_img)
 
@@ -197,13 +233,17 @@ if __name__ == "__main__":
 
                 # Paste on the obj
                 # new_obj = obj_img.resize(size=(w, h))
-                bkg_w_obj.paste(new_obj, (x, y), mask)
+                # bkg_w_obj.paste(new_obj, (x, y), mask)
+                bkg_w_obj.paste(new_obj, (x, y))
 
                 output_fp = output_images + str(n) + ".png"
                 # Save the image
                 bkg_w_obj.save(fp=output_fp, format="png")
+                cv_image = cv.imread(output_images + str(n) + ".png")
+                cv.imshow("asd", cv_image)
 
                 n += 1
 
     total_images = len([f for f in os.listdir(output_images) if not f.startswith(".")])
     print("Done! Created {} synthetic training images.".format(total_images), flush=True)
+    cv.waitKey(5000)
