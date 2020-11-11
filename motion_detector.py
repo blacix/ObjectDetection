@@ -1,3 +1,5 @@
+from _ast import alias
+
 import cv2 as cv
 from config import CAMERA_ID
 import camera_calibration as calib
@@ -8,22 +10,30 @@ IMAGE_AREA_RATIO = 10000
 
 class MotionDetector:
     def __init__(self):
-        self.first_frame_gray = None
-        self.actual_frame_gray = None
+        self.first_frame = None
+        self.actual_frame = None
+        self.prev_frame = None
         self.prev_frame_gray = None
+        self.actual_frame_gray = None
+
         self.idle_counter = 0
 
     def process(self, image):
-        if self.first_frame_gray is None:
-            self.first_frame_gray = self.prepare_image(image)
+        if self.first_frame is None:
+            self.first_frame = image
 
-        if self.actual_frame_gray is None:
-            self.actual_frame_gray = self.prepare_image(image)
+        if self.actual_frame is None:
+            self.actual_frame = image
 
-        self.prev_frame_gray = self.actual_frame_gray
-        self.actual_frame_gray = self.prepare_image(image)
+        self.prev_frame = self.actual_frame
+        self.actual_frame = image
 
+        self.image_changed(self.prev_frame, self.actual_frame)
+
+        self.prev_frame_gray = self.prepare_image(self.prev_frame)
+        self.actual_frame_gray = self.prepare_image(self.actual_frame)
         image, bounding_boxes = self.get_bounding_boxes(self.prev_frame_gray, self.actual_frame_gray)
+
 
         display_text = ""
         if len(list(bounding_boxes)) > 0:
@@ -69,6 +79,36 @@ class MotionDetector:
                     bounding_boxes.append((x, y, w, h))
 
         return image_with_boxes, bounding_boxes
+
+    @staticmethod
+    def image_changed(image1, image2):
+        h_bins = 50
+        s_bins = 60;
+        hist_size = [h_bins, s_bins]
+        channels = [0, 1]
+        # hue varies from 0 to 179, saturation from 0 to 255
+        h_ranges = [0, 180]
+        s_ranges = [0, 256]
+        ranges = [0, 180, 0, 256]
+        hist1 = None
+        hist2 = None
+        hvsImage1 = None
+        hvsImage2 = None
+
+        # Convert to HSV format
+        hvsImage1 = cv.cvtColor(image1, cv.COLOR_BGR2HSV)
+        hvsImage2 = cv.cvtColor(image2, cv.COLOR_BGR2HSV)
+
+        mask = None
+        hist1 = cv.calcHist([hvsImage1], channels, mask, hist_size, ranges)
+        # cv::normalize(hist2, hist2, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
+        cv.normalize(hist1, hist1, 0, 1, cv.NORM_MINMAX)
+
+        hist2 = cv.calcHist([hvsImage2], channels, mask, hist_size, ranges)
+        cv.normalize(hist2, hist2, 0, 1, cv.NORM_MINMAX)
+
+        result = cv.compareHist(hist1, hist2, cv.HISTCMP_CHISQR)
+        print("result: {}".format(result))
 
 
 if __name__ == '__main__':
