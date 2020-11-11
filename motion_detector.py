@@ -20,15 +20,15 @@ class MotionDetector:
 
     def process(self, image):
         if self.first_frame is None:
-            self.first_frame = image
+            self.first_frame = image.copy()
 
         if self.actual_frame is None:
-            self.actual_frame = image
+            self.actual_frame = image.copy()
 
-        self.prev_frame = self.actual_frame
-        self.actual_frame = image
+        self.prev_frame = self.actual_frame.copy()
+        self.actual_frame = image.copy()
 
-        self.image_changed(self.prev_frame, self.actual_frame)
+        hist_compare_result = self.image_changed(self.prev_frame, self.actual_frame)
 
         self.prev_frame_gray = self.prepare_image(self.prev_frame)
         self.actual_frame_gray = self.prepare_image(self.actual_frame)
@@ -47,7 +47,7 @@ class MotionDetector:
             else:
                 display_text = "waiting"
 
-        display_text = "boxes: " + str(len(list(bounding_boxes))) + " - " + display_text
+        display_text = "hist diff: " + str(hist_compare_result) + " boxes: " + str(len(list(bounding_boxes))) + " - " + display_text
         image = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                            cv.LINE_AA)
 
@@ -83,17 +83,14 @@ class MotionDetector:
     @staticmethod
     def image_changed(image1, image2):
         h_bins = 50
-        s_bins = 60;
+        s_bins = 60
+
         hist_size = [h_bins, s_bins]
         channels = [0, 1]
         # hue varies from 0 to 179, saturation from 0 to 255
         h_ranges = [0, 180]
         s_ranges = [0, 256]
         ranges = [0, 180, 0, 256]
-        hist1 = None
-        hist2 = None
-        hvsImage1 = None
-        hvsImage2 = None
 
         # Convert to HSV format
         hvsImage1 = cv.cvtColor(image1, cv.COLOR_BGR2HSV)
@@ -101,14 +98,13 @@ class MotionDetector:
 
         mask = None
         hist1 = cv.calcHist([hvsImage1], channels, mask, hist_size, ranges)
-        # cv::normalize(hist2, hist2, 0, 1, cv::NORM_MINMAX, -1, cv::Mat());
         cv.normalize(hist1, hist1, 0, 1, cv.NORM_MINMAX)
 
         hist2 = cv.calcHist([hvsImage2], channels, mask, hist_size, ranges)
         cv.normalize(hist2, hist2, 0, 1, cv.NORM_MINMAX)
 
         result = cv.compareHist(hist1, hist2, cv.HISTCMP_CHISQR)
-        print("result: {}".format(result))
+        return result
 
 
 if __name__ == '__main__':
