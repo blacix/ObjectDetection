@@ -29,17 +29,17 @@ class MotionDetector:
 
         if len(list(bounding_boxes)) > 0:
             self.idle_counter = 0
-            display_text = "motion"
+            state = "motion"
         else:
             self.idle_counter += 1
             if self.idle_counter > 5:
                 self.idle_counter = 5
-                display_text = "idle"
+                state = "idle"
             else:
-                display_text = "waiting"
+                state = "waiting"
 
-        display_text = "hist diff: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
-                       + " - " + display_text
+        display_text = "dHist: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
+                       + " - " + state
         image = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                            cv.LINE_AA)
 
