@@ -1,5 +1,3 @@
-from _ast import alias
-
 import cv2 as cv
 from config import CAMERA_ID
 import camera_calibration as calib
@@ -13,8 +11,6 @@ class MotionDetector:
         self.first_frame = None
         self.actual_frame = None
         self.prev_frame = None
-        self.prev_frame_gray = None
-        self.actual_frame_gray = None
 
         self.idle_counter = 0
 
@@ -28,14 +24,9 @@ class MotionDetector:
         self.prev_frame = self.actual_frame.copy()
         self.actual_frame = image.copy()
 
-        hist_compare_result = self.image_changed(self.prev_frame, self.actual_frame)
+        hist_compare_result = self.compare_hist(self.prev_frame, self.actual_frame)
+        image, bounding_boxes = self.get_bounding_boxes(self.prev_frame, self.actual_frame)
 
-        self.prev_frame_gray = self.prepare_image(self.prev_frame)
-        self.actual_frame_gray = self.prepare_image(self.actual_frame)
-        image, bounding_boxes = self.get_bounding_boxes(self.prev_frame_gray, self.actual_frame_gray)
-
-
-        display_text = ""
         if len(list(bounding_boxes)) > 0:
             self.idle_counter = 0
             display_text = "motion"
@@ -47,24 +38,29 @@ class MotionDetector:
             else:
                 display_text = "waiting"
 
-        display_text = "hist diff: " + str(hist_compare_result) + " boxes: " + str(len(list(bounding_boxes))) + " - " + display_text
+        display_text = "hist diff: " + str(hist_compare_result) + " boxes: " + str(len(list(bounding_boxes))) \
+                       + " - " + display_text
         image = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                            cv.LINE_AA)
 
+        return image
 
     @staticmethod
     def prepare_image(image):
-        ret = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        ret = cv.GaussianBlur(ret, (21, 21), 0)
-        return ret
+        prepared_image = image.copy()
+        prepared_image = cv.cvtColor(prepared_image, cv.COLOR_BGR2GRAY)
+        prepared_image = cv.GaussianBlur(prepared_image, (21, 21), 0)
+        return prepared_image
 
     @staticmethod
     def get_bounding_boxes(image1, image2):
-        image_with_boxes = image
+        image1_gray = MotionDetector.prepare_image(image1)
+        image2_gray = MotionDetector.prepare_image(image2)
+        image_with_boxes = image2.copy()
         bounding_boxes = []
 
         # compute difference between first frame and current frame
-        delta = cv.absdiff(image1, image2)
+        delta = cv.absdiff(image1_gray, image2_gray)
         ret, thresh_img = cv.threshold(delta, 25, 255, cv.THRESH_BINARY)
 
         contours, hierarchy = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_TC89_L1)
@@ -81,7 +77,7 @@ class MotionDetector:
         return image_with_boxes, bounding_boxes
 
     @staticmethod
-    def image_changed(image1, image2):
+    def compare_hist(image1, image2):
         h_bins = 50
         s_bins = 60
 
@@ -113,15 +109,15 @@ if __name__ == '__main__':
 
     # wait for auto focus
     for i in range(100):
-        ret, image = cap.read()
+        ret, frame = cap.read()
 
     while True:
-        ret, image = cap.read()
+        ret, frame = cap.read()
         if not ret:
             continue
 
-        motion_detector.process(image)
-        cv.imshow('motion detection', image)
+        frame = motion_detector.process(frame)
+        cv.imshow('motion detection', frame)
         if cv.waitKey(100) == ord('q'):
             break
 
