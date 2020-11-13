@@ -62,13 +62,14 @@ class MotionDetector:
         # compute difference between first frame and current frame
         delta = cv.absdiff(image1_gray, image2_gray)
         ret, thresh_img = cv.threshold(delta, 25, 255, cv.THRESH_BINARY)
+        # thresh_img = cv.dilate(thresh_img, None, iterations=2)
 
         contours, hierarchy = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_TC89_L1)
         if contours is not None:
             # cv.drawContours(image, contours, -1, (0, 255, 0), 3)
             for contour in contours:
                 image_area = np.prod(image_with_boxes.shape)
-                if cv.contourArea(contour) >= image_area / IMAGE_AREA_RATIO:
+                if cv.contourArea(contour) >= 1:  # image_area / IMAGE_AREA_RATIO:
                     approx = cv.approxPolyDP(contour, 3, True)
                     x, y, w, h = cv.boundingRect(approx)
                     cv.rectangle(image_with_boxes, (x, y), (x + w, y + h), (0, 255, 0), 2)
