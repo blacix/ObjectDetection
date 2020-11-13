@@ -38,7 +38,7 @@ class MotionDetector:
             else:
                 display_text = "waiting"
 
-        display_text = "hist diff: " + str(hist_compare_result) + " boxes: " + str(len(list(bounding_boxes))) \
+        display_text = "hist diff: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
                        + " - " + display_text
         image = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
                            cv.LINE_AA)
