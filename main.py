@@ -1,29 +1,17 @@
 import cv2 as cv
-
-import camera_calibration as calib
-import config
-from object_detector import ObjectDetector
-from marker_detector import MarkerDetector
-from motion_detector import MotionDetector
+from image_processing import ImageProcessor
 
 
 def main():
-    cap = calib.UndistortedVideoCapture(config.CAMERA_ID)
-
-    object_detector = ObjectDetector()
-    marker_detector = MarkerDetector()
-    motion_detector = MotionDetector()
-
+    # image_processor1 = ImageProcessor(0)
+    image_processor2 = ImageProcessor(2)
     while True:
-        ret, image = cap.read()
-        if not ret:
-            continue
+        # image1 = image_processor1.process_image()
+        image2 = image_processor2.process_image()
 
-        image = motion_detector.process(image)
-        image = object_detector.detect_objects(image)
-        image, _, _ = marker_detector.detect_markers(image)
+        # cv.imshow('camera 0', image1)
+        cv.imshow('camera 2', image2)
 
-        cv.imshow('objects', image)
         if cv.waitKey(100) == ord('q'):
             break
 
