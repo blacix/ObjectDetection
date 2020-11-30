@@ -13,17 +13,18 @@ class ImageProcessor:
         self.marker_detector = MarkerDetector()
         self.motion_detector = MotionDetector()
         # self.object_detector = ObjectDetector()
-        self.camera_id = camera_id
-        # self.cap = UndistortedVideoCapture(self.camera_id)
-        # self.thread = Thread(target=self.loop)
-        # self.thread.start()
-
+    #     self.camera_id = camera_id
+    #     self.cap = None # UndistortedVideoCapture(self.camera_id)
+    #     self.thread = Thread(target=self.loop)
+    #     self.thread.start()
+    #
     # def loop(self):
+    #     self.cap = UndistortedVideoCapture(self.camera_id)
     #     while True:
     #         print(threading.currentThread().ident)
     #         ret, image = self.cap.read()
     #         image = self.process_image(image)
-    #         time.sleep(0.01)
+    #         time.sleep(10)
     #         cv.imshow('camera {}'.format(self.camera_id), image)
     #         if cv.waitKey(100) == ord('q'):
     #             break
