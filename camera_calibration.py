@@ -11,7 +11,7 @@ from config import CAMERA_ID, USE_CALIBRATION
 
 class UndistortedVideoCapture:
     def __init__(self, camera_id):
-        self.camera_calibration = CameraCalibration()
+        self.camera_calibration = CameraCalibration(camera_id)
         self.camera_calibration.load_calibration()
         self.video_capture = cv.VideoCapture(camera_id)
 
@@ -24,7 +24,8 @@ class UndistortedVideoCapture:
 
 
 class CameraCalibration:
-    def __init__(self):
+    def __init__(self, camera_id):
+        self.camera_id = camera_id
         self.camera_matrix = None
         self.new_camera_matrix = None
         self.dist_coeffs = None
@@ -43,15 +44,18 @@ class CameraCalibration:
         term_criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         # term_criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_COUNT, 30, 0.1)
 
-        cap = cv.VideoCapture(CAMERA_ID)
+        cap = cv.VideoCapture(self.camera_id)
+        cnt = 0
         while True:
             ret, img = cap.read()
             gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             found, corners = cv.findChessboardCorners(img, pattern_size)
 
             if found:
-                obj_points.append(pattern_points)
+                # cnt += 1
+                # cv.imwrite("calib_" + str(cnt) + ".png", img)
 
+                obj_points.append(pattern_points)
                 corners_subpix = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), term_criteria)
                 img_points.append(corners_subpix)
 
@@ -60,13 +64,13 @@ class CameraCalibration:
 
             cv.imshow('calibration', img)
             if cv.waitKey(500) == ord('q'):
-                break;
+                break
 
         cv.destroyWindow('calibration')
         h, w, _ = img.shape
         h, w, = gray.shape
 
-        print("calibrating camera...");
+        print("calibrating camera...")
         if len(obj_points) > 0:
             ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, (w, h), None,
                                                                                None)
@@ -74,6 +78,10 @@ class CameraCalibration:
 
             print("calculating optimal camera matrix...");
             new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
+
+            self.camera_matrix = camera_matrix
+            self.dist_coeffs = dist_coeffs
+            self.new_camera_matrix = new_camera_matrix
 
         print("camera  calibrated")
         cv.destroyWindow('calibration')
@@ -120,7 +128,7 @@ class CameraCalibration:
 
 
 def main():
-    camera_calibration = CameraCalibration()
+    camera_calibration = CameraCalibration(CAMERA_ID)
     camera_calibration.calibrate_camera()
     camera_calibration.save_calibration()
     # camera_calibration.load_calibration()
