@@ -178,20 +178,27 @@ class CameraCalibration:
 
         return undistorted_image
 
-    def save_calibration(self):
+    def save_calibration(self, name=None):
         print('Saving calibration...')
-
+        if name is None:
+            file_name = 'calibration.yml'
+        else:
+            file_name = f'calibration_{name}.yml'
         # writes array to .yml file
-        fs_write = cv.FileStorage('calibration.yml', cv.FILE_STORAGE_WRITE)
+        fs_write = cv.FileStorage(file_name, cv.FILE_STORAGE_WRITE)
         arr = np.random.rand(5, 5)
         fs_write.write("camera_matrix", self.camera_matrix)
         fs_write.write("new_camera_matrix", self.new_camera_matrix)
         fs_write.write("dist_coeffs", self.dist_coeffs)
         fs_write.release()
 
-    def load_calibration(self):
+    def load_calibration(self, name=None):
         print('Loading calibration...')
-        fs_read = cv.FileStorage('calibration.yml', cv.FILE_STORAGE_READ)
+        if name is None:
+            file_name = 'calibration.yml'
+        else:
+            file_name = f'calibration_{name}.yml'
+        fs_read = cv.FileStorage(file_name, cv.FILE_STORAGE_READ)
         self.camera_matrix = fs_read.getNode('camera_matrix').mat()
         self.new_camera_matrix = fs_read.getNode('new_camera_matrix').mat()
         self.dist_coeffs = fs_read.getNode('dist_coeffs').mat()
