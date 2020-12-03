@@ -30,6 +30,84 @@ class CameraCalibration:
         self.new_camera_matrix = None
         self.dist_coeffs = None
 
+    def calibrate_fisheye(self):
+        import cv2
+        import numpy as np
+        import os
+        import glob
+        CHECKERBOARD = (6, 9)
+        subpix_criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
+        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_CHECK_COND + cv2.fisheye.CALIB_FIX_SKEW
+        objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
+        objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+        _img_shape = None
+        objpoints = []  # 3d point in real world space
+        imgpoints = []  # 2d points in image plane.
+        images = glob.glob('*.jpg')
+        cap = cv.VideoCapture(self.camera_id)
+        while True:
+            ret, img = cap.read()
+            if not ret:
+                continue
+
+            _img_shape = img.shape[:2]
+            gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+            # Find the chess board corners
+            ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD,
+                                                     cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
+            # If found, add object points, image points (after refining them)
+            if ret == True:
+                objpoints.append(objp)
+                cv2.cornerSubPix(gray, corners, (3, 3), (-1, -1), subpix_criteria)
+                imgpoints.append(corners)
+
+            img = cv.drawChessboardCorners(img, (9, 6), corners, ret)
+            cv.imshow('calibration', img)
+            if cv.waitKey(500) == ord('q'):
+                break
+
+        N_OK = len(objpoints)
+        K = np.zeros((3, 3))
+        D = np.zeros((4, 1))
+        rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+        tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+        rms, _, _, _, _ = \
+            cv2.fisheye.calibrate(
+                objpoints,
+                imgpoints,
+                gray.shape[::-1],
+                K,
+                D,
+                rvecs,
+                tvecs,
+                calibration_flags,
+                (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
+            )
+        print("Found " + str(N_OK) + " valid images for calibration")
+        print("DIM=" + str(_img_shape[::-1]))
+        print("K=np.array(" + str(K.tolist()) + ")")
+        print("D=np.array(" + str(D.tolist()) + ")")
+
+        # h, w, = gray.shape
+        # new_camera_matrix, roi = cv.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, (w, h), 1, (w, h))
+
+        while True:
+            ret, img = cap.read()
+            if not ret:
+                continue
+            h, w = img.shape[:2]
+            _img_shape = img.shape[:2]
+            DIM = _img_shape[::-1]
+
+            # map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, DIM, cv2.CV_16SC2)
+            # undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
+            dst = cv.fisheye.undistortImage(img, K, D, None, K)
+
+            cv.imshow('calibration', dst)
+            if cv.waitKey(500) == ord('q'):
+                break
+
     def calibrate_camera(self):
         square_size = 5.0
         pattern_size = (9, 6)
@@ -129,8 +207,8 @@ class CameraCalibration:
 
 def main():
     camera_calibration = CameraCalibration(CAMERA_ID)
-    camera_calibration.calibrate_camera()
-    camera_calibration.save_calibration()
+    camera_calibration.calibrate_fisheye()
+    # camera_calibration.save_calibration()
     # camera_calibration.load_calibration()
     cap = UndistortedVideoCapture(CAMERA_ID)
     while True:
