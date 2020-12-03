@@ -197,7 +197,7 @@ class CameraCalibration:
         self.new_camera_matrix = fs_read.getNode('new_camera_matrix').mat()
         self.dist_coeffs = fs_read.getNode('dist_coeffs').mat()
         # TODO looks like a matrix in the yml
-        self.fisheye = fs_read.getNode('fisheye')
+        # self.fisheye = fs_read.getNode('fisheye')
         fs_read.release()
 
     def is_camera_calibrated(self):
@@ -205,9 +205,9 @@ class CameraCalibration:
 
 
 class UndistortedVideoCapture:
-    def __init__(self, camera_id, camera_calibration=None):
+    def __init__(self, camera_id, camera_calibration=None, fisheye=False):
         if camera_calibration is None:
-            self.camera_calibration = CameraCalibration(camera_id)
+            self.camera_calibration = CameraCalibration(camera_id, fisheye)
             self.camera_calibration.load_calibration()
         else:
             self.camera_calibration = camera_calibration
@@ -222,10 +222,10 @@ class UndistortedVideoCapture:
 
 
 def main():
-    camera_calibration = CameraCalibration(CAMERA_ID, True)
+    camera_calibration = CameraCalibration(CAMERA_ID, fisheye=True)
     camera_calibration.calibrate()
     camera_calibration.save_calibration()
-    cap = UndistortedVideoCapture(CAMERA_ID)
+    cap = UndistortedVideoCapture(CAMERA_ID, fisheye=True)
     while True:
         ret, img = cap.read()
         if not ret:
