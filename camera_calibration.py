@@ -9,6 +9,7 @@ import glob
 
 from config import CAMERA_ID, USE_CALIBRATION
 
+
 # https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
 # https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-part-2-13990f1b157f
 
@@ -42,8 +43,10 @@ class CameraCalibration:
 
     def calibrate(self):
         if self.fisheye:
-            self.pattern_points = np.zeros((1, self.checkboard_pattern_size[0] * self.checkboard_pattern_size[1], 3), np.float32)
-            self.pattern_points[0, :, :2] = np.mgrid[0:self.checkboard_pattern_size[0], 0:self.checkboard_pattern_size[1]].T.reshape(-1, 2)
+            self.pattern_points = np.zeros((1, self.checkboard_pattern_size[0] * self.checkboard_pattern_size[1], 3),
+                                           np.float32)
+            self.pattern_points[0, :, :2] = np.mgrid[0:self.checkboard_pattern_size[0],
+                                            0:self.checkboard_pattern_size[1]].T.reshape(-1, 2)
         else:
             square_size = 5.0
             # prepare pattern_points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
@@ -192,7 +195,7 @@ class CameraCalibration:
         fs_write.write("dist_coeffs", self.dist_coeffs)
         fs_write.release()
 
-    def load_calibration(self, name=None):
+    def load_calibration(self, name: str = None):
         print('Loading calibration...')
         if name is None:
             file_name = 'calibration.yml'
