@@ -38,7 +38,7 @@ class CameraCalibration:
         import glob
         CHECKERBOARD = (6, 9)
         subpix_criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_FIX_SKEW  # + cv2.fisheye.CALIB_CHECK_COND
+        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_FIX_SKEW + cv2.fisheye.CALIB_CHECK_COND
         objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
         objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
         _img_shape = None
@@ -90,11 +90,11 @@ class CameraCalibration:
         print("K=np.array(" + str(K.tolist()) + ")")
         print("D=np.array(" + str(D.tolist()) + ")")
 
+        print("calibration done")
         while True:
             ret, img = cap.read()
             if not ret:
                 continue
-            h, w = img.shape[:2]
             _img_shape = img.shape[:2]
             DIM = _img_shape[::-1]
             balance = 1
@@ -114,9 +114,12 @@ class CameraCalibration:
             # This is how scaled_K, dim2 and balance are used to determine the final K used to un-distort image. OpenCV document failed to make this clear!
             new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(scaled_K, D, dim2, np.eye(3),
                                                                            balance=balance)
-            map1, map2 = cv2.fisheye.initUndistortRectifyMap(scaled_K, D, np.eye(3), new_K, dim3, cv2.CV_16SC2)
-            undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
+            # with remap
+            # map1, map2 = cv2.fisheye.initUndistortRectifyMap(scaled_K, D, np.eye(3), new_K, dim3, cv2.CV_16SC2)
+            # undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
+            undistorted_img = cv.fisheye.undistortImage(img, K, D, None, new_K)
 
             cv.imshow('calibration', undistorted_img)
             if cv.waitKey(500) == ord('q'):
