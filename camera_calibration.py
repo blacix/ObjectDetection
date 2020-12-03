@@ -31,13 +31,14 @@ class CameraCalibration:
         self.dist_coeffs = None
 
     def calibrate_fisheye(self):
+        # https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
         import cv2
         import numpy as np
         import os
         import glob
         CHECKERBOARD = (6, 9)
         subpix_criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
-        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_CHECK_COND + cv2.fisheye.CALIB_FIX_SKEW
+        calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC + cv2.fisheye.CALIB_FIX_SKEW  # + cv2.fisheye.CALIB_CHECK_COND
         objp = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
         objp[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
         _img_shape = None
@@ -81,15 +82,13 @@ class CameraCalibration:
                 rvecs,
                 tvecs,
                 calibration_flags,
-                (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
+                (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+                # (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 1e-6)
             )
         print("Found " + str(N_OK) + " valid images for calibration")
         print("DIM=" + str(_img_shape[::-1]))
         print("K=np.array(" + str(K.tolist()) + ")")
         print("D=np.array(" + str(D.tolist()) + ")")
-
-        # h, w, = gray.shape
-        # new_camera_matrix, roi = cv.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, (w, h), 1, (w, h))
 
         while True:
             ret, img = cap.read()
@@ -98,13 +97,28 @@ class CameraCalibration:
             h, w = img.shape[:2]
             _img_shape = img.shape[:2]
             DIM = _img_shape[::-1]
+            balance = 1
+            dim2 = None
+            dim3 = None
 
-            # map1, map2 = cv2.fisheye.initUndistortRectifyMap(K, D, np.eye(3), K, DIM, cv2.CV_16SC2)
-            # undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+            dim1 = img.shape[:2][::-1]  # dim1 is the dimension of input image to un-distort
+            assert dim1[0] / dim1[1] == DIM[0] / DIM[
+                1], "Image to undistort needs to have same aspect ratio as the ones used in calibration"
+            if not dim2:
+                dim2 = dim1
+            if not dim3:
+                dim3 = dim1
+            scaled_K = K * dim1[0] / DIM[0]  # The values of K is to scale with image dimension.
+            scaled_K[2][2] = 1.0  # Except that K[2][2] is always 1.0
 
-            dst = cv.fisheye.undistortImage(img, K, D, None, K)
+            # This is how scaled_K, dim2 and balance are used to determine the final K used to un-distort image. OpenCV document failed to make this clear!
+            new_K = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(scaled_K, D, dim2, np.eye(3),
+                                                                           balance=balance)
+            map1, map2 = cv2.fisheye.initUndistortRectifyMap(scaled_K, D, np.eye(3), new_K, dim3, cv2.CV_16SC2)
+            undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
-            cv.imshow('calibration', dst)
+
+            cv.imshow('calibration', undistorted_img)
             if cv.waitKey(500) == ord('q'):
                 break
 
