@@ -9,7 +9,7 @@ import time
 
 
 class ImageProcessor:
-    def __init__(self, camera_id):
+    def __init__(self):
         self.marker_detector = MarkerDetector()
         self.motion_detector = MotionDetector()
         # self.object_detector = ObjectDetector()
