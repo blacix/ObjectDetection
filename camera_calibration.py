@@ -187,7 +187,6 @@ class CameraCalibration:
         fs_write.write("camera_matrix", self.camera_matrix)
         fs_write.write("new_camera_matrix", self.new_camera_matrix)
         fs_write.write("dist_coeffs", self.dist_coeffs)
-        fs_write.write("fisheye", self.fisheye)
         fs_write.release()
 
     def load_calibration(self):
@@ -196,7 +195,7 @@ class CameraCalibration:
         self.camera_matrix = fs_read.getNode('camera_matrix').mat()
         self.new_camera_matrix = fs_read.getNode('new_camera_matrix').mat()
         self.dist_coeffs = fs_read.getNode('dist_coeffs').mat()
-        # TODO looks like a matrix in the yml
+        # TODO
         # self.fisheye = fs_read.getNode('fisheye')
         fs_read.release()
 
@@ -205,7 +204,7 @@ class CameraCalibration:
 
 
 class UndistortedVideoCapture:
-    def __init__(self, camera_id, camera_calibration=None, fisheye=False):
+    def __init__(self, camera_id, fisheye=False, camera_calibration=None):
         if camera_calibration is None:
             self.camera_calibration = CameraCalibration(camera_id, fisheye)
             self.camera_calibration.load_calibration()
