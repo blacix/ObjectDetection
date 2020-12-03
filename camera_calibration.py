@@ -221,6 +221,8 @@ class UndistortedVideoCapture:
         else:
             self.camera_calibration = camera_calibration
         self.video_capture = cv.VideoCapture(camera_id)
+        # self.video_capture.set(cv.CAP_PROP_FRAME_WIDTH, 640)
+        # self.video_capture.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
 
     def read(self):
         ret, image = self.video_capture.read()
