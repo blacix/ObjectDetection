@@ -4,6 +4,8 @@ from image_processing import ImageProcessor
 from camera_calibration import UndistortedVideoCapture
 import threading
 cap0 = UndistortedVideoCapture(2, fisheye=True)
+cap0.camera_calibration.load_calibration('elp')
+
 cap1 = UndistortedVideoCapture(0, fisheye=False)
 cap1.camera_calibration.load_calibration('logitech')
 

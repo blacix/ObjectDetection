@@ -91,14 +91,13 @@ class CameraCalibration:
         DIM = self.shape[:2][::-1]  # (w, h)
         N_OK = len(self.obj_points)
 
-        print("Found " + str(N_OK) + " valid images for calibration")
-        print("DIM=" + str(DIM))
-
         self.camera_matrix = np.zeros((3, 3))
         self.dist_coeffs = np.zeros((4, 1))
 
         rvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
         tvecs = [np.zeros((1, 1, 3), dtype=np.float64) for i in range(N_OK)]
+
+        print('calibrating fisheye camera...')
 
         rms, _, _, _, _ = \
             cv.fisheye.calibrate(
@@ -113,6 +112,7 @@ class CameraCalibration:
                 self.fisheye_calibration_criteria
             )
 
+        print("calculating optimal camera matrix...")
         # calculating new camera matrix
         balance = 1
         self.dim1 = DIM  # self.shape[:2][::-1]  # dim1 is the dimension of input image to un-distort
@@ -136,11 +136,12 @@ class CameraCalibration:
 
         print("calibrating camera...")
         if len(self.obj_points) > 0:
+            # criteria and flags were not set
             ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(self.obj_points, self.img_points, (w, h),
-                                                                               None, None)
-            # ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, gray.shape[::-1], None, None)
+                                                                               self.fisheye_calibration_flags,
+                                                                               self.fisheye_calibration_criteria)
 
-            print("calculating optimal camera matrix...");
+            print("calculating optimal camera matrix...")
             new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(camera_matrix, dist_coeffs, (w, h), 1, (w, h))
 
             self.camera_matrix = camera_matrix
@@ -217,7 +218,7 @@ class UndistortedVideoCapture:
     def __init__(self, camera_id, fisheye=False, camera_calibration=None):
         if camera_calibration is None:
             self.camera_calibration = CameraCalibration(camera_id, fisheye)
-            self.camera_calibration.load_calibration()
+            # self.camera_calibration.load_calibration()
         else:
             self.camera_calibration = camera_calibration
         self.video_capture = cv.VideoCapture(camera_id)
@@ -237,6 +238,7 @@ def main():
     camera_calibration.calibrate()
     camera_calibration.save_calibration()
     cap = UndistortedVideoCapture(CAMERA_ID, fisheye=True)
+    cap.camera_calibration.load_calibration()
     while True:
         ret, img = cap.read()
         if not ret:
