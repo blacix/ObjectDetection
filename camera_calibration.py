@@ -6,10 +6,7 @@ from __future__ import print_function
 import numpy as np
 import cv2 as cv
 import glob
-
-from config import CAMERA_ID, USE_CALIBRATION
-
-
+from config import CAMERA_ID
 # https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-333b05afa0b0
 # https://medium.com/@kennethjiang/calibrate-fisheye-lens-using-opencv-part-2-13990f1b157f
 
@@ -188,6 +185,7 @@ class CameraCalibration:
             file_name = 'calibration.yml'
         else:
             file_name = f'calibration_{name}.yml'
+        print(f'Saving calibration {file_name}...')
         # writes array to .yml file
         fs_write = cv.FileStorage(file_name, cv.FILE_STORAGE_WRITE)
         arr = np.random.rand(5, 5)
@@ -197,11 +195,12 @@ class CameraCalibration:
         fs_write.release()
 
     def load_calibration(self, name: str = None):
-        print('Loading calibration...')
         if name is None:
             file_name = 'calibration.yml'
         else:
             file_name = f'calibration_{name}.yml'
+
+        print(f'Loading calibration {file_name}...')
         fs_read = cv.FileStorage(file_name, cv.FILE_STORAGE_READ)
         self.camera_matrix = fs_read.getNode('camera_matrix').mat()
         self.new_camera_matrix = fs_read.getNode('new_camera_matrix').mat()
@@ -222,14 +221,16 @@ class UndistortedVideoCapture:
         else:
             self.camera_calibration = camera_calibration
         self.video_capture = cv.VideoCapture(camera_id)
-        # self.video_capture.set(cv.CAP_PROP_FRAME_WIDTH, 640)
-        # self.video_capture.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
+        # https://raspberrypi.stackexchange.com/questions/105358/raspberry-pi4-error-while-using-2-usb-cameras-vidioc-qbuf-invalid-argument/
+        # set to compressed format, so USB won't hang
+        self.video_capture.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+        # self.video_capture.set(cv.CAP_PROP_FRAME_WIDTH, 1024)
+        # self.video_capture.set(cv.CAP_PROP_FRAME_HEIGHT, 768)
 
     def read(self):
         ret, image = self.video_capture.read()
         if ret:
-            if USE_CALIBRATION:
-                image = self.camera_calibration.undistort(image)
+            image = self.camera_calibration.undistort(image)
         return ret, image
 
 

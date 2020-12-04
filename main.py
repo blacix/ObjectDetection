@@ -5,7 +5,6 @@ from camera_calibration import UndistortedVideoCapture
 import threading
 cap0 = UndistortedVideoCapture(2, fisheye=True)
 cap0.camera_calibration.load_calibration('elp')
-
 cap1 = UndistortedVideoCapture(0, fisheye=False)
 cap1.camera_calibration.load_calibration('logitech')
 
@@ -29,13 +28,13 @@ def main():
         if cv.waitKey(10) == ord('q'):
             break
 
-        # ret, image1 = cap1.read()
-        # if not ret:
-        #     continue
-        # image1 = image_processor1.process_image(image1)
-        # cv.imshow('camera 1', image1)
-        # if cv.waitKey(10) == ord('q'):
-        #     break
+        ret, image1 = cap1.read()
+        if not ret:
+            continue
+        image1 = image_processor1.process_image(image1)
+        cv.imshow('camera 1', image1)
+        if cv.waitKey(10) == ord('q'):
+            break
 
     cv.destroyAllWindows()
 
