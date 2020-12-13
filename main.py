@@ -37,9 +37,10 @@ def main():
             (img_proc, cap) = future_to_processors[future]
             try:
                 image = future.result()
-                cv.imshow(str(cap.camera_calibration.camera_id), image)
             except Exception as exc:
                 print(f"exception: {exc}")
+            else:
+                cv.imshow(str(cap.camera_calibration.camera_id), image)
 
         if cv.waitKey(10) == ord('q'):
             break
