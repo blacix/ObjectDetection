@@ -20,6 +20,12 @@ image_processors = [(image_processor_elp, cap_elp), (image_processor_logitech, c
 
 
 def main():
+    # used to record the time when we processed last frame
+    prev_frame_time = 0
+
+    # used to record the time at which we processed current frame
+    new_frame_time = 0
+
     while True:
         # futures = []
         # for (img_proc, cap) in image_processors:
@@ -31,7 +37,7 @@ def main():
         #     cv.imshow(str(cnt), image)
         #     cnt += 1
 
-        print('starting...')
+        # print('starting...')
         future_to_processors = \
             {executor.submit(process, img_proc, cap): (img_proc, cap) for (img_proc, cap) in image_processors}
         for future in concurrent.futures.as_completed(future_to_processors):
@@ -43,6 +49,18 @@ def main():
             else:
                 cv.imshow(str(cap.camera_calibration.camera_id), image)
 
+        new_frame_time = time.time()
+        fps = 1 / (new_frame_time - prev_frame_time)
+        prev_frame_time = new_frame_time
+
+        # converting the fps into integer
+        fps = int(fps)
+
+        # converting the fps to string so that we can display it on frame
+        # by using putText function
+        fps = str(fps)
+        print(f'fps:{fps}')
+
         if cv.waitKey(10) == ord('q'):
             break
 
@@ -52,7 +70,7 @@ def main():
 def process(image_processor, cap):
     ret, image = cap.read()
     image = image_processor.process_image(image)
-    print(f'processed {threading.currentThread().ident}')
+    # print(f'processed {threading.currentThread().ident}')
     return image
 
 
