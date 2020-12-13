@@ -12,16 +12,16 @@ cap_elp.camera_calibration.load_calibration('elp')
 cap_logitech = UndistortedVideoCapture(2, fisheye=False)
 cap_logitech.camera_calibration.load_calibration('logitech')
 
-image_processor0 = ImageProcessor()
-image_processor1 = ImageProcessor()
+image_processor_elp = ImageProcessor()
+image_processor_logitech = ImageProcessor()
 
 executor = ThreadPoolExecutor(max_workers=3)
 
 
 def main():
     while True:
-        future_elp = executor.submit(process_elp)
-        future_logitech = executor.submit(process_logitech)
+        future_elp = executor.submit(process, image_processor_elp, cap_elp)
+        future_logitech = executor.submit(process, image_processor_logitech, cap_logitech)
 
         image_elp = future_elp.result()
         image_logitech = future_logitech.result()
@@ -33,18 +33,10 @@ def main():
     cv.destroyAllWindows()
 
 
-def process_elp():
-    print("e")
-    ret, image0 = cap_elp.read()
-    image0 = image_processor0.process_image(image0)
-    return image0
-
-
-def process_logitech():
-    print("l")
-    ret, image1 = cap_logitech.read()
-    image1 = image_processor1.process_image(image1)
-    return image1
+def process(image_processor, cap):
+    ret, image = cap.read()
+    image = image_processor.process_image(image)
+    return image
 
 
 if __name__ == '__main__':
