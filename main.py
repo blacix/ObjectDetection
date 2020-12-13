@@ -1,42 +1,50 @@
-import asyncio
 import cv2 as cv
 from image_processing import ImageProcessor
 from camera_calibration import UndistortedVideoCapture
 import threading
-cap0 = UndistortedVideoCapture(2, fisheye=True)
-cap0.camera_calibration.load_calibration('elp')
-cap1 = UndistortedVideoCapture(0, fisheye=False)
-cap1.camera_calibration.load_calibration('logitech')
+from threading import Thread
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+
+cap_elp = UndistortedVideoCapture(0, fisheye=True)
+cap_elp.camera_calibration.load_calibration('elp')
+cap_logitech = UndistortedVideoCapture(2, fisheye=False)
+cap_logitech.camera_calibration.load_calibration('logitech')
 
 image_processor0 = ImageProcessor()
 image_processor1 = ImageProcessor()
 
-
-def task(image):
-    print(threading.currentThread().ident)
-    # image = image_processor0.process_image(image)
-    return image
+executor = ThreadPoolExecutor(max_workers=3)
 
 
 def main():
     while True:
-        ret, image0 = cap0.read()
-        if not ret:
-            continue
-        image0 = image_processor0.process_image(image0)
-        cv.imshow('camera 0', image0)
-        if cv.waitKey(10) == ord('q'):
-            break
+        future_elp = executor.submit(process_elp)
+        future_logitech = executor.submit(process_logitech)
 
-        ret, image1 = cap1.read()
-        if not ret:
-            continue
-        image1 = image_processor1.process_image(image1)
-        cv.imshow('camera 1', image1)
+        image_elp = future_elp.result()
+        image_logitech = future_logitech.result()
+        cv.imshow('camera elp', image_elp)
+        cv.imshow('camera logitech', image_logitech)
         if cv.waitKey(10) == ord('q'):
             break
 
     cv.destroyAllWindows()
+
+
+def process_elp():
+    print("e")
+    ret, image0 = cap_elp.read()
+    image0 = image_processor0.process_image(image0)
+    return image0
+
+
+def process_logitech():
+    print("l")
+    ret, image1 = cap_logitech.read()
+    image1 = image_processor1.process_image(image1)
+    return image1
 
 
 if __name__ == '__main__':

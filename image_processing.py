@@ -12,6 +12,8 @@ class ImageProcessor:
     def __init__(self):
         self.marker_detector = MarkerDetector()
         self.motion_detector = MotionDetector()
+        self.thread = None
+        self.image = None
         # self.object_detector = ObjectDetector()
     #     self.camera_id = camera_id
     #     self.cap = None # UndistortedVideoCapture(self.camera_id)
@@ -30,10 +32,8 @@ class ImageProcessor:
     #             break
 
     def process_image(self, image):
-        # if not ret:
-        #     return image
-
         # image = self.object_detector.detect_objects(image)
-        image = self.motion_detector.process(image)
-        image, _, _ = self.marker_detector.detect_markers(image)
-        return image
+        self.image = self.motion_detector.process(image)
+        self.image, _, _ = self.marker_detector.detect_markers(self.image)
+        return self.image
+
