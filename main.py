@@ -5,7 +5,7 @@ import threading
 from threading import Thread
 import time
 from concurrent.futures import ThreadPoolExecutor
-
+import concurrent.futures
 
 cap_elp = UndistortedVideoCapture(0, fisheye=True)
 cap_elp.camera_calibration.load_calibration('elp')
@@ -16,17 +16,31 @@ image_processor_elp = ImageProcessor()
 image_processor_logitech = ImageProcessor()
 
 executor = ThreadPoolExecutor(max_workers=3)
+image_processors = [(image_processor_elp, cap_elp), (image_processor_logitech, cap_logitech)]
 
 
 def main():
     while True:
-        future_elp = executor.submit(process, image_processor_elp, cap_elp)
-        future_logitech = executor.submit(process, image_processor_logitech, cap_logitech)
+        # futures = []
+        # for (img_proc, cap) in image_processors:
+        #     futures.append(executor.submit(process, img_proc, cap))
+        #
+        # cnt = 0
+        # for future in futures:
+        #     image = future.result()
+        #     cv.imshow(str(cnt), image)
+        #     cnt += 1
 
-        image_elp = future_elp.result()
-        image_logitech = future_logitech.result()
-        cv.imshow('camera elp', image_elp)
-        cv.imshow('camera logitech', image_logitech)
+        future_to_processors = \
+            {executor.submit(process, img_proc, cap): (img_proc, cap) for (img_proc, cap) in image_processors}
+        for future in concurrent.futures.as_completed(future_to_processors):
+            (img_proc, cap) = future_to_processors[future]
+            try:
+                image = future.result()
+                cv.imshow(str(cap.camera_calibration.camera_id), image)
+            except Exception as exc:
+                print(f"exception: {exc}")
+
         if cv.waitKey(10) == ord('q'):
             break
 
