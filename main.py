@@ -31,6 +31,7 @@ def main():
         #     cv.imshow(str(cnt), image)
         #     cnt += 1
 
+        print('starting...')
         future_to_processors = \
             {executor.submit(process, img_proc, cap): (img_proc, cap) for (img_proc, cap) in image_processors}
         for future in concurrent.futures.as_completed(future_to_processors):
@@ -51,6 +52,7 @@ def main():
 def process(image_processor, cap):
     ret, image = cap.read()
     image = image_processor.process_image(image)
+    print(f'processed {threading.currentThread().ident}')
     return image
 
 
