@@ -20,7 +20,7 @@ executor = ThreadPoolExecutor(max_workers=3)
 image_processors = [(image_processor_elp, cap_elp), (image_processor_logitech, cap_logitech)]
 
 
-async def main():
+def main():
     # used to record the time when we processed last frame
     prev_frame_time = 0
 
@@ -41,6 +41,8 @@ async def main():
         # print('starting...')
         future_to_processors = \
             {executor.submit(process, img_proc, cap): (img_proc, cap) for (img_proc, cap) in image_processors}
+        # done, pending = concurrent.futures.wait(future_to_processors)
+        # for future in done:
         for future in concurrent.futures.as_completed(future_to_processors):
             (img_proc, cap) = future_to_processors[future]
             try:
@@ -92,9 +94,10 @@ async def main():
 
 
 def process(image_processor, cap):
+    # print(f'process {threading.currentThread().ident}')
     ret, image = cap.read()
-    image = image_processor.process_image(image)
-    # print(f'processed {threading.currentThread().ident}')
+    image = image_processor.process_image_paralell(image)
+    print(f'processed {cap.camera_calibration.camera_id} {threading.currentThread().ident}')
     return image
 
 
@@ -131,6 +134,6 @@ async def async_main():
 
 
 if __name__ == '__main__':
-    # asyncio.run(async_main())
-    asyncio.run(main())
+    main()
+    # asyncio.run(main())
 

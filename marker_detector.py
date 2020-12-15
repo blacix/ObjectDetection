@@ -20,7 +20,7 @@ class MarkerDetector:
         corners, ids, rejected_img_points = aruco.detectMarkers(
             gray, self.aruco_dict, parameters=self.arucoParameters)
         image_markers = aruco.drawDetectedMarkers(image, corners, ids)
-        return image_markers, corners, ids
+        return image_markers
 
     def generate_marker_images(self):
         self.aruco_dict = aruco.Dictionary_create(MARKER_DICT_SIZE, 3)

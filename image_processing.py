@@ -13,7 +13,7 @@ class ImageProcessor:
         self.motion_detector = MotionDetector()
         self.image = None
         # self.object_detector = ObjectDetector()
-        # self.executor = ThreadPoolExecutor(max_workers=3)
+        self.executor = ThreadPoolExecutor(max_workers=3)
 
     def process_image(self, image):
         print(threading.current_thread().name)
@@ -27,19 +27,19 @@ class ImageProcessor:
     #     future = self.executor.submit(self.process_image, image)
     #     return future.result()
 
-    # async def process_image_async(self, image):
-    #     arr = [self.marker_detector, self.motion_detector]
-    #     images = []
-    #     future_to_processors = \
-    #         {self.executor.submit(p.process, image): p for p in arr}
-    #     for future in concurrent.futures.as_completed(future_to_processors):
-    #         p = future_to_processors[future]
-    #         try:
-    #             images.append(future.result())
-    #             # image = future.result()
-    #         except Exception as exc:
-    #             print(f"exception: {exc}")
-    #         else:
-    #             pass
-    #
-    #     return images
+    def process_image_paralell(self, image):
+        # print(f'process_image_async {threading.currentThread().ident}')
+        arr = [self.motion_detector, self.marker_detector]
+        images = []
+        future_to_processors = \
+            {self.executor.submit(p.process, image): p for p in arr}
+        for future in concurrent.futures.as_completed(future_to_processors):
+            p = future_to_processors[future]
+            try:
+                processed_image = future.result()
+            except Exception as exc:
+                print(f"exception: {exc}")
+            else:
+                images.append(processed_image)
+
+        return images[0]
