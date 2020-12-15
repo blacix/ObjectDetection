@@ -15,7 +15,7 @@ class MarkerDetector:
         self.arucoParameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
         # self.arucoParameters.minDistanceToBorder = 5
 
-    def detect_markers(self, image):
+    def process(self, image):
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         corners, ids, rejected_img_points = aruco.detectMarkers(
             gray, self.aruco_dict, parameters=self.arucoParameters)

@@ -20,7 +20,7 @@ executor = ThreadPoolExecutor(max_workers=3)
 image_processors = [(image_processor_elp, cap_elp), (image_processor_logitech, cap_logitech)]
 
 
-def main():
+async def main():
     # used to record the time when we processed last frame
     prev_frame_time = 0
 
@@ -50,6 +50,22 @@ def main():
             else:
                 cv.imshow(str(cap.camera_calibration.camera_id), image)
 
+        # coroutines = [process(img_proc, cap) for (img_proc, cap) in image_processors]
+        # results = await asyncio.gather(*coroutines)
+        # for i in range(len(results)):
+        #     cv.imshow(str(image_processors[i][1].camera_calibration.camera_id), results[i])
+        # done, pending = await asyncio.wait(coroutines)
+        # print(done)
+        # for future in done:
+        #     cv.imshow('a', future.result())
+
+        # coroutines = [process(img_proc, cap) for (img_proc, cap) in image_processors]
+        # results = await asyncio.gather(*coroutines)
+        # # print(len(results))
+        # for i in range(len(results)):
+        #     # cv.imshow(str(i), results[i])
+        #     cv.imshow(str(image_processors[i][1].camera_calibration.camera_id), results[i])
+
         new_frame_time = time.time()
         fps = 1 / (new_frame_time - prev_frame_time)
         prev_frame_time = new_frame_time
@@ -66,6 +82,13 @@ def main():
             break
 
     cv.destroyAllWindows()
+
+
+# async def process(image_processor, cap):
+#     ret, image = cap.read()
+#     images = await image_processor.process_image_async(image)
+#     # print(f'processed {threading.currentThread().ident}')
+#     return images
 
 
 def process(image_processor, cap):
@@ -108,6 +131,6 @@ async def async_main():
 
 
 if __name__ == '__main__':
-    asyncio.run(async_main())
-    # main()
+    # asyncio.run(async_main())
+    asyncio.run(main())
 
