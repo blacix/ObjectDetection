@@ -99,9 +99,12 @@ async def async_main():
     #     print(res)
 
     coroutines = [async_func(string) for string in strings]
-    done, pending = await asyncio.wait(coroutines)
-    for coroutine in done:
-        print(coroutine.result())
+    # done, pending = await asyncio.wait(coroutines)
+    # for coroutine in done:
+    #     print(coroutine.result())
+    results = await asyncio.gather(*coroutines)
+    for r in results:
+        print(r)
 
 
 if __name__ == '__main__':
