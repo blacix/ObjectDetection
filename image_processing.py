@@ -19,8 +19,8 @@ class ImageProcessor:
 
     def process_image(self, image):
         # image = self.object_detector.detect_objects(image)
-        self.image = self.motion_detector.process(image)
-        self.image = self.marker_detector.process(self.image)
+        self.image, _ = self.motion_detector.process(image)
+        self.image, _ = self.marker_detector.process(self.image)
         return self.image
 
     def process_image_paralell(self, image):
@@ -33,7 +33,7 @@ class ImageProcessor:
         for future in concurrent.futures.as_completed(future_to_processors):
             p = future_to_processors[future]
             try:
-                processed_image = future.result()
+                processed_image, _ = future.result()
             except Exception as exc:
                 print(f"exception: {exc}")
             else:

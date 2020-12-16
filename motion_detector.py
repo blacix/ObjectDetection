@@ -11,8 +11,8 @@ class MotionDetector:
         self.first_frame = None
         self.actual_frame = None
         self.prev_frame = None
-
         self.idle_counter = 0
+        self.motion = True
 
     def process(self, image):
         if self.first_frame is None:
@@ -25,12 +25,14 @@ class MotionDetector:
         self.actual_frame = image.copy()
 
         hist_compare_result = self.compare_hist(self.prev_frame, self.actual_frame)
-        image, bounding_boxes = self.get_bounding_boxes(self.prev_frame, self.actual_frame)
+        image_with_bbs, bounding_boxes = self.get_bounding_boxes(self.prev_frame, self.actual_frame)
 
         if len(list(bounding_boxes)) > 0:
+            self.motion = True
             self.idle_counter = 0
             state = "motion"
         else:
+            self.motion = False
             self.idle_counter += 1
             if self.idle_counter > 5:
                 self.idle_counter = 5
@@ -40,10 +42,10 @@ class MotionDetector:
 
         display_text = "dHist: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
                        + " - " + state
-        image = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
-                           cv.LINE_AA)
+        image_with_bbs = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                                    cv.LINE_AA)
 
-        return image
+        return image_with_bbs, self.motion
 
     @staticmethod
     def prepare_image(image):
