@@ -1,6 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
 import threading
+import cv2 as cv
+import numpy as np
 
 # from object_detector import ObjectDetector
 from marker_detector import MarkerDetector
@@ -16,21 +18,16 @@ class ImageProcessor:
         self.executor = ThreadPoolExecutor(max_workers=3)
 
     def process_image(self, image):
-        print(threading.current_thread().name)
-        # print(threading.get_ident())
         # image = self.object_detector.detect_objects(image)
         self.image = self.motion_detector.process(image)
-        self.image, _, _ = self.marker_detector.process(self.image)
+        self.image = self.marker_detector.process(self.image)
         return self.image
-
-    # async def process_image_async(self, image):
-    #     future = self.executor.submit(self.process_image, image)
-    #     return future.result()
 
     def process_image_paralell(self, image):
         # print(f'process_image_async {threading.currentThread().ident}')
+        # TODO all must have the same interface: .process(image)
         arr = [self.motion_detector, self.marker_detector]
-        images = []
+        ret_image = np.zeros(image.shape, np.uint8)
         future_to_processors = \
             {self.executor.submit(p.process, image): p for p in arr}
         for future in concurrent.futures.as_completed(future_to_processors):
@@ -40,6 +37,6 @@ class ImageProcessor:
             except Exception as exc:
                 print(f"exception: {exc}")
             else:
-                images.append(processed_image)
+                ret_image = cv.add(ret_image, processed_image)
+        return ret_image
 
-        return images[0]
