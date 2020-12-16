@@ -39,4 +39,3 @@ class ImageProcessor:
             else:
                 ret_image = cv.add(ret_image, processed_image)
         return ret_image
-

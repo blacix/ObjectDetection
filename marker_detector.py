@@ -43,7 +43,7 @@ if __name__ == '__main__':
         ret, image = cap.read()
         if not ret:
             continue
-        image, _, ids = marker_detector.detect_markers(image)
+        image, ids = marker_detector.process(image)
         if ids is not None:
             marker_count = len(ids)
         text = "markers: {}".format(marker_count)
