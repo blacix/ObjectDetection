@@ -1,5 +1,9 @@
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 import random
+
+
 strings = ['a', 'b', 'c']
 
 
@@ -8,6 +12,15 @@ async def async_func(string):
     print(f'async_func sleeps {sleep_time}')
     await asyncio.sleep(sleep_time)
     return string
+
+
+def thread_func(loop):
+    loop.call_soon_threadsafe(callback)
+    return "yolo"
+
+
+def callback():
+    print('calback')
 
 
 async def async_main():
@@ -22,7 +35,7 @@ async def async_main():
     # for t in tasks:
     #     res = await t
     #     print(res)
-
+    #
     coroutines = [async_func(string) for string in strings]
     # done, pending = await asyncio.wait(coroutines)
     # for coroutine in done:
@@ -30,6 +43,11 @@ async def async_main():
     results = await asyncio.gather(*coroutines)
     for r in results:
         print(r)
+
+    loop = asyncio.get_running_loop()
+    executor = ThreadPoolExecutor(max_workers=3)
+    future = executor.submit(thread_func, loop)
+    print(future.result())
 
 
 if __name__ == '__main__':
