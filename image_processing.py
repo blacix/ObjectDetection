@@ -23,11 +23,11 @@ class ImageProcessor:
         self.image, _ = self.marker_detector.process(self.image)
         return self.image
 
-    def process_image_paralell(self, image):
+    def process_image_parallel(self, image):
         # print(f'process_image_async {threading.currentThread().ident}')
         # TODO all must have the same interface: .process(image)
         arr = [self.motion_detector, self.marker_detector]
-        ret_image = np.zeros(image.shape, np.uint8)
+        ret_image = image.copy()
         future_to_processors = \
             {self.executor.submit(p.process, image): p for p in arr}
         for future in concurrent.futures.as_completed(future_to_processors):

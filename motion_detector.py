@@ -2,8 +2,16 @@ import cv2 as cv
 from config import CAMERA_ID
 import camera_calibration as calib
 import numpy as np
+from enum import Enum, auto
+
 
 IMAGE_AREA_RATIO = 10000
+
+
+class State(Enum):
+    IDLE = auto()
+    WAITING = auto()
+    MOTION = auto()
 
 
 class MotionDetector:
@@ -13,6 +21,7 @@ class MotionDetector:
         self.prev_frame = None
         self.idle_counter = 0
         self.motion = True
+        self.state = State.IDLE
 
     def process(self, image):
         if self.first_frame is None:
@@ -30,20 +39,20 @@ class MotionDetector:
         if len(list(bounding_boxes)) > 0:
             self.motion = True
             self.idle_counter = 0
-            state = "motion"
+            self.state = State.MOTION
         else:
             self.motion = False
             self.idle_counter += 1
             if self.idle_counter > 5:
                 self.idle_counter = 5
-                state = "idle"
+                self.state = State.IDLE
             else:
-                state = "waiting"
+                self.state = State.WAITING
 
-        display_text = "dHist: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
-                       + " - " + state
-        image_with_bbs = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
-                                    cv.LINE_AA)
+        # display_text = "dHist: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
+        #                + " - " + state
+        # image_with_bbs = cv.putText(image, display_text, (00, 450), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+        #                             cv.LINE_AA)
 
         return image_with_bbs, self.motion
 
@@ -58,7 +67,8 @@ class MotionDetector:
     def get_bounding_boxes(image1, image2):
         image1_gray = MotionDetector.prepare_image(image1)
         image2_gray = MotionDetector.prepare_image(image2)
-        image_with_boxes = image2.copy()
+        # image_with_boxes = image2.copy()
+        image_with_boxes = np.zeros(image2.shape, np.uint8)
         bounding_boxes = []
 
         # compute difference between first frame and current frame
@@ -68,7 +78,7 @@ class MotionDetector:
 
         contours, hierarchy = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_TC89_L1)
         if contours is not None:
-            # cv.drawContours(image, contours, -1, (0, 255, 0), 3)
+            # cv.drawContours(image_with_boxes, contours, -1, (0, 255, 0), 3)
             for contour in contours:
                 image_area = np.prod(image_with_boxes.shape)
                 if cv.contourArea(contour) >= 1:  # image_area / IMAGE_AREA_RATIO:
@@ -119,7 +129,7 @@ if __name__ == '__main__':
         if not ret:
             continue
 
-        frame = motion_detector.process(frame)
+        frame, _ = motion_detector.process(frame)
         cv.imshow('motion detection', frame)
         if cv.waitKey(100) == ord('q'):
             break

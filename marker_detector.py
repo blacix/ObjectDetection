@@ -1,5 +1,6 @@
 import cv2 as cv
 import cv2.aruco as aruco
+import numpy as np
 from config import CAMERA_ID
 import camera_calibration as calib
 
@@ -19,7 +20,8 @@ class MarkerDetector:
         gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
         corners, ids, rejected_img_points = aruco.detectMarkers(
             gray, self.aruco_dict, parameters=self.arucoParameters)
-        image_markers = aruco.drawDetectedMarkers(image, corners, ids)
+        image_markers = np.zeros(image.shape, np.uint8)
+        image_markers = aruco.drawDetectedMarkers(image_markers, corners, ids)
         return image_markers, ids
 
     def generate_marker_images(self):
