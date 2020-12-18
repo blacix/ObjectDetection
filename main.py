@@ -52,9 +52,9 @@ def main():
 
 def process(image_processor, cap):
     ret, image = cap.read()
-    images = image_processor.process_image_parallel(image)
+    ret_image = image_processor.process_image_parallel(image)
     # print(f'processed {threading.currentThread().ident}')
-    return images
+    return ret_image
 
 
 def create_display_text(ops, ids, motion):

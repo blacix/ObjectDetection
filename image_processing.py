@@ -1,6 +1,4 @@
 from concurrent.futures import ThreadPoolExecutor
-import concurrent.futures
-import threading
 import cv2 as cv
 import numpy as np
 
@@ -13,22 +11,24 @@ class ImageProcessor:
     def __init__(self):
         self.marker_detector = MarkerDetector()
         self.motion_detector = MotionDetector()
-        self.image = None
         # self.object_detector = ObjectDetector()
         self.executor = ThreadPoolExecutor(max_workers=3)
 
     def process_image(self, image):
         # image = self.object_detector.detect_objects(image)
-        self.image, _ = self.motion_detector.process(image)
-        self.image, _ = self.marker_detector.process(self.image)
-        return self.image
+        motion_image, motion_detected = self.motion_detector.process(image)
+        marker_image, ids = self.marker_detector.process(image)
+        ret_image = self.decorate_image(image, motion_image)
+        ret_image = self.decorate_image(ret_image, marker_image)
+        return ret_image, ids, motion_detected
 
     def process_image_parallel(self, image):
-        ret_image = np.zeros(image.shape, np.uint8)
-
         motion_future = self.executor.submit(self.motion_detector.process, image)
         marker_future = self.executor.submit(self.marker_detector.process, image)
 
+        ret_image = np.zeros(image.shape, np.uint8)
+        ids = []
+        motion_detected = False
         try:
             motion_image, motion_detected = motion_future.result()
             marker_image, ids = marker_future.result()
