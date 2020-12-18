@@ -26,25 +26,24 @@ def main():
     ops = 0
     while True:
         # print('starting...')
-
         future_to_processors = \
             {executor.submit(process, img_proc, cap): (img_proc, cap) for (img_proc, cap) in image_processors}
         # done, pending = concurrent.futures.wait(future_to_processors)
         # for future in done:
+        ids = []
+        motion_detected = False
         for future in concurrent.futures.as_completed(future_to_processors):
             (img_proc, cap) = future_to_processors[future]
             try:
-                image = future.result()
+                image, ids, motion_detected = future.result()
             except Exception as exc:
                 print(f"exception: {exc}")
             else:
-                # display_text = f'ops: {ops}'
-                # image = cv.putText(image, display_text, (00, 20), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2,
-                #                    cv.LINE_AA)
-                cv.imshow(str(cap.camera_calibration.camera_id), image)
+                # cv.imshow(str(cap.camera_calibration.camera_id), image)
+                cv.imshow(str(cap.camera_calibration.camera_id), add_data_to_image(image, ops, ids, motion_detected))
 
         ops = ops_meter.loop()
-        print(ops)
+        # print(create_display_text(ops, ids, motion_detected))
         if cv.waitKey(10) == ord('q'):
             break
 
@@ -56,6 +55,16 @@ def process(image_processor, cap):
     images = image_processor.process_image_parallel(image)
     # print(f'processed {threading.currentThread().ident}')
     return images
+
+
+def create_display_text(ops, ids, motion):
+    return f'ops: {ops}, ids: {len(ids)}, motion: {motion}'
+
+
+def add_data_to_image(image, ops, ids, motion):
+    display_text = create_display_text(ops, ids, motion)
+    image = cv.putText(image, display_text, (00, 20), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2, cv.LINE_AA)
+    return image
 
 
 if __name__ == '__main__':

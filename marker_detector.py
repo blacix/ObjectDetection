@@ -22,6 +22,8 @@ class MarkerDetector:
             gray, self.aruco_dict, parameters=self.arucoParameters)
         image_markers = np.zeros(image.shape, np.uint8)
         image_markers = aruco.drawDetectedMarkers(image_markers, corners, ids)
+        if ids is None:
+            ids = []
         return image_markers, ids
 
     def generate_marker_images(self):

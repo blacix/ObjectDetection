@@ -38,7 +38,7 @@ class ImageProcessor:
             ret_image = self.decorate_image(image, marker_image)
             ret_image = self.decorate_image(ret_image, motion_image)
 
-        return ret_image
+        return ret_image, ids, motion_detected
 
     @staticmethod
     def decorate_image(image, decoration_image):
