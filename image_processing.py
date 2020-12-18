@@ -37,5 +37,15 @@ class ImageProcessor:
             except Exception as exc:
                 print(f"exception: {exc}")
             else:
+                # image processors return images that contains only the "highlights" of ROI.
+                # simple addition changes colour, but fast
                 ret_image = cv.add(ret_image, processed_image)
+
+                # bitwise stuff is slow
+                # image_empty = np.zeros(image.shape, np.uint8)
+                # img_gray = cv.cvtColor(processed_image, cv.COLOR_BGR2GRAY)
+                # ret, mask = cv.threshold(img_gray, 10, 255, cv.THRESH_BINARY)
+                # ret_image = cv.bitwise_and(ret_image, image_empty, ret_image, mask=mask)
+                # ret_image = cv.bitwise_or(processed_image, ret_image, ret_image, mask=mask)
+
         return ret_image
