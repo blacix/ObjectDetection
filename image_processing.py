@@ -19,7 +19,7 @@ class ImageProcessor:
         motion_image, motion_detected = self.motion_detector.process(image)
         marker_image, ids = self.marker_detector.process(image)
         ret_image = self.decorate_image(image, marker_image)
-        ret_image = self.decorate_image(ret_image, motion_image)
+        # ret_image = self.decorate_image(ret_image, motion_image)
 
         return ret_image, ids, motion_detected
 
