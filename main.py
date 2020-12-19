@@ -28,10 +28,12 @@ def main():
         # print('starting...')
         future_to_processors = \
             {executor.submit(process, img_proc, cap): (img_proc, cap) for (img_proc, cap) in image_processors}
-        # done, pending = concurrent.futures.wait(future_to_processors)
-        # for future in done:
+
         ids = []
         motion_detected = False
+
+        # done, pending = concurrent.futures.wait(future_to_processors)
+        # for future in done:
         for future in concurrent.futures.as_completed(future_to_processors):
             (img_proc, cap) = future_to_processors[future]
             try:

@@ -18,8 +18,9 @@ class ImageProcessor:
         # image = self.object_detector.detect_objects(image)
         motion_image, motion_detected = self.motion_detector.process(image)
         marker_image, ids = self.marker_detector.process(image)
-        ret_image = self.decorate_image(image, motion_image)
-        ret_image = self.decorate_image(ret_image, marker_image)
+        ret_image = self.decorate_image(image, marker_image)
+        ret_image = self.decorate_image(ret_image, motion_image)
+
         return ret_image, ids, motion_detected
 
     def process_image_parallel(self, image):
@@ -36,7 +37,7 @@ class ImageProcessor:
             print(f"exception: {exc}")
         else:
             ret_image = self.decorate_image(image, marker_image)
-            ret_image = self.decorate_image(ret_image, motion_image)
+            # ret_image = self.decorate_image(ret_image, motion_image)
 
         return ret_image, ids, motion_detected
 

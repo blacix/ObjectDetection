@@ -41,12 +41,13 @@ class MotionDetector:
             self.idle_counter = 0
             self.state = State.MOTION
         else:
-            self.motion = False
             self.idle_counter += 1
             if self.idle_counter > 5:
+                self.motion = False
                 self.idle_counter = 5
                 self.state = State.IDLE
             else:
+                self.motion = True
                 self.state = State.WAITING
 
         # display_text = "dHist: " + str(hist_compare_result)[0:5] + " boxes: " + str(len(list(bounding_boxes))) \
