@@ -51,7 +51,7 @@ class ObjectDetector:
     def load_label_map():
         return label_map_util.create_category_index_from_labelmap(config.PATH_TO_LABELS, use_display_name=True)
 
-    def detect_objects(self, image):
+    def process(self, image):
         image_np = np.array(image)
         # image_np = np.array(image)
 
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         if not ret:
             continue
 
-        image = object_detector.detect_objects(image)
+        image = object_detector.process(image)
         cv.imshow('object detection', image)
         if cv.waitKey(100) == ord('q'):
             break

@@ -15,7 +15,7 @@ class ImageProcessor:
         self.executor = ThreadPoolExecutor(max_workers=3)
 
     def process_image(self, image):
-        # image = self.object_detector.detect_objects(image)
+        # objects_image = self.object_detector.detect_objects(image)
         motion_image, motion_detected = self.motion_detector.process(image)
         marker_image, ids = self.marker_detector.process(image)
         ret_image = self.decorate_image(image, marker_image)
@@ -24,6 +24,7 @@ class ImageProcessor:
         return ret_image, ids, motion_detected
 
     def process_image_parallel(self, image):
+        # objects_future = self.executor.submit(self.object_detector.process, image)
         motion_future = self.executor.submit(self.motion_detector.process, image)
         marker_future = self.executor.submit(self.marker_detector.process, image)
 
@@ -31,6 +32,7 @@ class ImageProcessor:
         ids = []
         motion_detected = False
         try:
+            # objects_image = objects_future.result()
             motion_image, motion_detected = motion_future.result()
             marker_image, ids = marker_future.result()
         except Exception as exc:
